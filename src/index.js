@@ -8,17 +8,20 @@ if (process.env.NODE_ENV !== 'production')
 {
     let sideBar = document.querySelector('.sidebar');
     let arrowCollapse = document.querySelector('#collapse-sidebar-icon');
-    sideBar.onclick = () =>
+    if (arrowCollapse)
     {
-        sideBar.classList.toggle('collapse');
-        arrowCollapse.classList.toggle('collapse');
-        if (arrowCollapse.classList.contains('collapse'))
+        arrowCollapse.onclick = () =>
         {
-            arrowCollapse.classList = "fi fi-rr-angle-right collapse";
-        }
-        else
-        {
-            arrowCollapse.classList = "fi fi-rr-angle-left";
-        }
-    };
+            sideBar.classList.toggle('collapse');
+            arrowCollapse.classList.toggle('collapse');
+            if (arrowCollapse.classList.contains('collapse'))
+            {
+                arrowCollapse.classList = "fi fi-rr-angle-right collapse";
+            }
+            else
+            {
+                arrowCollapse.classList = "fi fi-rr-angle-left";
+            }
+        };
+    }
 }
