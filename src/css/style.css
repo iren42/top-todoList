@@ -66,6 +66,7 @@ li {
 
 button {
 	cursor: pointer;
+	border-radius: var(--border-radius);
 }
 
 header {
@@ -74,7 +75,14 @@ header {
 
 footer {
 	grid-area: footer;
-	height: var(--footer-height);
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	color: var(--dark-grey);
+
+	& a {
+		color: var(--dark-grey);
+	}
 }
 
 .main {
@@ -84,11 +92,11 @@ footer {
 .container {
 	height: 100%;
 	display: grid;
-	grid-template-rows: min-content 1fr min-content;
+	grid-template-columns: min-content 1fr;
+	grid-template-rows: 1fr min-content;
 	grid-template-areas:
-		"header"
-		"main"
-		"footer";
+		"header main"
+		"header footer";
 }
 
 .sidebar {
@@ -97,8 +105,6 @@ footer {
 	padding: var(--spacing-sm);
 	background-color: var(--background);
 	border-right: 1px solid var(--border-color);
-	position: fixed;
-	top: 0;
 }
 
 .logo-name-wrapper {
