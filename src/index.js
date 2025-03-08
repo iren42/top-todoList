@@ -89,11 +89,12 @@ const DOMController = (function ()
 
                 Storage.setItem(localStorage, newProject.id, newProject);
 
-                // immediately open that new project on the editor view
                 view(editor, newProject.content);
 
                 updateScreen(localStorage);
                 const button = document.querySelector(`#${ CSS.escape(newProject.id) }`);
+                if (!button)
+                    throw new Error(`Project's ID ${ newProject.id } not found in DOM`);
                 button.classList.add("active");
             }
             else if (event.target.closest("#clearBtn"))
@@ -105,22 +106,25 @@ const DOMController = (function ()
             else if (event.target.closest("#saveBtn"))
             {
                 console.log("saving");
-                // edit project obj 
                 const key = document.querySelector(".project.active").id;
                 if (!key)
-                    throw new Error(`Could not save, no ID found`);
-                const activeProject = Storage.getItem(localStorage, key);
-                activeProject.content = editor.innerText;
-                Storage.setItem(localStorage, activeProject.id, activeProject);
+                    throw new Error(`Active project does not have an ID`);
+                const stored = Storage.getItem(localStorage, key);
+                if (!stored)
+                    throw new Error(`No stored item for this key: ${ key }`);
+                stored.content = editor.innerText;
+                Storage.setItem(localStorage, stored.id, stored);
             }
             else if (event.target.closest("button.project"))
             {
                 let target = findParentElByClass(event.target, "project");
+                if (!target)
+                    throw new Error(`Could not find <button class="project">`);
                 if (!(target.classList.contains("active")))
                     target.classList.add("active");
                 const stored = Storage.getItem(localStorage, target.id);
                 if (!stored)
-                    throw new Error(`no stored item for this key: ${ target.id }`);
+                    throw new Error(`No stored item for this key: ${ target.id }`);
                 view(editor, stored.content)
             }
             else;
