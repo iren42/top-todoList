@@ -64,4 +64,8 @@
 		white-space: pre-wrap;
 		display: inline-block;
 	}
+
+	& .preview * {
+		all: revert;
+	}
 }

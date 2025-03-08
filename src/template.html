@@ -21,7 +21,7 @@
                     </button>
                 </div>
 
-                <ul class="overviews">
+                <ul class="overviewList">
                     <li>
                         <button type="button" class="overview active">
                             <i class="fi fi-rr-calendar-day overview-icon"></i>
@@ -45,20 +45,21 @@
                     </li>
                 </ul>
 
-                <ul class="overviews">
-                    <div class="overview-header">Projects</div>
-                    <li class="overview">
-                        <i class="fi fi-rr-folder overview-icon"></i>
-                        <span class="overview-text">Default</span>
-                        <span class="tooltip">Default</span>
-                    </li>
+                    <div class="project-header-wrapper">
+                        <div class="project-header">Projects</div>
+                        <button class="project-header__button" id="addNewProject">
+                            <i class="fi fi-tr-add-document project-header-icon"></i>
+                        </button>
+                    </div>
+                <ul class="projectList">
                 </ul>
             </div>
         </header>
 
         <div class="main">
             <div class="left">
-                <button type="button" id="saveBtn">Save</button>
+                <button type="button " id="saveBtn">Save</button>
+                <button type="button " id="clearBtn">Clear data</button>
                 <div class="editor" contenteditable="true"></div>
             </div>
             <div class="right">
