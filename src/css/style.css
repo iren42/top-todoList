@@ -202,6 +202,10 @@ footer {
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
+.project.active {
+	background-color: var(--grey);
+}
+
 .project:hover .tooltip,
 .overview:hover .tooltip {
 	top: 50%;

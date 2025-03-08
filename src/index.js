@@ -42,6 +42,16 @@ editor.addEventListener("input", event =>
 
 const DOMController = (function ()
 {
+    function removeActiveClasses(){
+        const list = document.querySelectorAll(".project.active");
+        if (!list)
+            return ;
+        for(let i = 0; i < list.length; i++)
+        {
+            list[i].classList.remove("active");
+        }
+    }
+
     function updateScreen(list)
     {
         console.log("load my project list, " + list.length);
@@ -120,6 +130,7 @@ const DOMController = (function ()
                 let target = findParentElByClass(event.target, "project");
                 if (!target)
                     throw new Error(`Could not find <button class="project">`);
+                removeActiveClasses();
                 if (!(target.classList.contains("active")))
                     target.classList.add("active");
                 const stored = Storage.getItem(localStorage, target.id);
