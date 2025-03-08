@@ -55,7 +55,7 @@ const DOMController = (function ()
             console.log(`key: ${ key }`);
             // const stored = JSON.parse(list.getItem(key));
             const stored = Storage.getItem(localStorage, key);
-            const li = DOMCreator.project(stored.name);
+            const li = DOMCreator.project(stored.name, stored.id);
             projectListDiv.append(li);
         }
     }
@@ -87,12 +87,12 @@ const DOMController = (function ()
             console.log("add a new project");
             const newProject = new Project();
 
-            Storage.setItem(localStorage, newProject.name, newProject);
+            Storage.setItem(localStorage, newProject.id, newProject);
 
             // immediately open that new project on the editor view
             view(editor, newProject.content);
             updateScreen(localStorage);
-            const active = document.querySelector(`#${ CSS.escape(newProject.name) }`);
+            const active = document.querySelector(`#${ CSS.escape(newProject.id) }`);
             active.classList.add("active");
         }
         else if (event.target.closest("#clearBtn"))
@@ -110,7 +110,7 @@ const DOMController = (function ()
                 return;
             const activeProject = Storage.getItem(localStorage, key);
             activeProject.content = editor.innerText;
-            Storage.setItem(localStorage, activeProject.name, activeProject);
+            Storage.setItem(localStorage, activeProject.id , activeProject);
         }
         else if (event.target.closest("button.project"))
         {

@@ -1,6 +1,6 @@
 export const DOMCreator = (function ()
 {
-    function project(name)
+    function project(name, iud)
     {
         const li = document.createElement("li");
         // li.classList.add("project");
@@ -8,7 +8,7 @@ export const DOMCreator = (function ()
         const button = document.createElement("button");
         button.type = "button";
         button.classList.add("project");
-        button.id = name;
+        button.id = iud;
 
         const icon = document.createElement("i");
         icon.classList.add("fi", "fi-rr-file", "project-icon");
