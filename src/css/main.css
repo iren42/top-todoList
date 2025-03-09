@@ -1,32 +1,4 @@
-:root {
-	--spacing-xxs: 0.25rem;
-	--spacing-xs: 0.5rem;
-	--spacing-sm: 1rem;
-	--spacing-md: 2rem;
-	--spacing-lg: 4rem;
-	--spacing-xl: 8rem;
-	--spacing-xxl: 16rem;
-
-	--font-size-sm: 0.625rem;
-	--font-size-md: 1rem;
-	--font-size-lg: 1.25rem;
-	--font-size-xl: 2rem;
-
-	--lh: 1.5;
-
-	--blue: #0087af;
-	--pink: #d70087;
-	--violet: #8700af;
-	--dark-blue: #005f87;
-	--dark: #181818;
-	--light: #F2F3F4;
-	--grey: #D7D7D9;
-	--light-grey: #E8E9EB;
-	--dark-grey: #AFAFB0;
-	--foreground: var(--dark);
-	--background: var(--light);
-	--border-color: var(--grey);
-}
+@import './constants.css';
 
 .main {
 	display: grid;

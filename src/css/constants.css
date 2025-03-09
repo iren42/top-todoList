@@ -1,0 +1,38 @@
+:root {
+	--border-radius: 8px;
+	--max-width: 1024px;
+	--header-height: 5rem;
+	--header-height: 3rem;
+	--sidebar-width: 18rem;
+	--sidebar-width-collapsed: 5rem;
+
+	--icon-lg: 1.8rem;
+	--icon-md: 1.5rem;
+
+	--spacing-xxs: 0.25rem;
+	--spacing-xs: 0.5rem;
+	--spacing-sm: 1rem;
+	--spacing-md: 2rem;
+	--spacing-lg: 4rem;
+	--spacing-xl: 8rem;
+	--spacing-xxl: 16rem;
+
+	--font-size-sm: 0.625rem;
+	--font-size-md: 1rem;
+	--font-size-lg: 1.25rem;
+	--font-size-xl: 2rem;
+
+	--lh: 1.5;
+	--box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+
+	--dark: #181818;
+	--light: #F2F3F4;
+	--grey: #D7D7D9;
+	--light-grey: #E8E9EB;
+	--dark-grey: #AFAFB0;
+    /* --darker-grey: #A4A5A6; */
+	--foreground: var(--dark);
+	--background: var(--light);
+	--border-color: var(--grey);
+	--hover-color: var(--light-grey);
+}

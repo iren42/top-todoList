@@ -21,10 +21,23 @@ export const DOMCreator = (function ()
         spanTooltip.classList.add("tooltip");
         spanTooltip.textContent = name;
 
-        button.appendChild(icon);
-        button.appendChild(spanText);
-        button.appendChild(spanTooltip);
-        li.appendChild(button);
+        const dropdown = document.createElement("div");
+        dropdown.classList.add("dropdown");
+
+        const dropdownBtn = document.createElement("i");
+        dropdownBtn.classList.add("fi", "fi-rr-menu-dots", "dropbtn");
+
+        const dropdownContent = document.createElement("div");
+        dropdownContent.classList.add("dropdown-content");
+        dropdownContent.innerHTML = `
+        <div class="rename-project">Rename</div>
+        <div class="delete-project">Delete</div>
+        `;
+
+        dropdown.append(dropdownBtn, dropdownContent);
+
+        button.append(icon, spanText, spanTooltip, dropdown);
+        li.append(button);
         return (li);
     }
     return ({

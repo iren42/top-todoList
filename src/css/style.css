@@ -1,40 +1,5 @@
 @import "~@flaticon/flaticon-uicons/css/all/all";
-
-:root {
-	--border-radius: 8px;
-	--max-width: 1024px;
-	--header-height: 5rem;
-	--header-height: 3rem;
-	--sidebar-width: 18rem;
-	--sidebar-width-collapsed: 5rem;
-
-	--icon-lg: 1.8rem;
-	--icon-md: 1.5rem;
-
-	--spacing-xxs: 0.25rem;
-	--spacing-xs: 0.5rem;
-	--spacing-sm: 1rem;
-	--spacing-md: 2rem;
-	--spacing-lg: 4rem;
-	--spacing-xl: 8rem;
-	--spacing-xxl: 16rem;
-
-	--font-size-sm: 0.625rem;
-	--font-size-md: 1rem;
-	--font-size-lg: 1.25rem;
-	--font-size-xl: 2rem;
-
-	--lh: 1.5;
-
-	--dark: #181818;
-	--light: #F2F3F4;
-	--grey: #D7D7D9;
-	--light-grey: #E8E9EB;
-	--dark-grey: #AFAFB0;
-	--foreground: var(--dark);
-	--background: var(--light);
-	--border-color: var(--grey);
-}
+@import './constants.css';
 
 *,
 *::before,
@@ -100,6 +65,7 @@ footer {
 		"header footer";
 }
 
+/* SIDEBAR */
 .sidebar {
 	width: var(--sidebar-width);
 	height: 100%;
@@ -148,7 +114,6 @@ footer {
 .project {
 	display: flex;
 	align-items: center;
-	justify-content: flex-start;
 	position: relative;
 	padding: var(--spacing-xs);
 	color: var(--foreground);
@@ -160,7 +125,7 @@ footer {
 
 .overview:hover,
 .project:hover {
-	background-color: var(--light-grey);
+	background-color: var(--hover-color);
 }
 
 .project-icon,
@@ -177,6 +142,8 @@ footer {
 	margin-left: var(--spacing-sm);
 	font-size: var(--font-size-md);
 	white-space: nowrap;
+	flex-grow: 1;
+	text-align: start;
 	opacity: 1;
 }
 
@@ -199,7 +166,7 @@ footer {
 	font-size: var(--font-size-md);
 	opacity: 0;
 	display: none;
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	box-shadow: var(--box-shadow);
 }
 
 .project.active {
@@ -235,4 +202,66 @@ footer {
 .sidebar.collapse .overview-header-wrapper {
 	opacity: 0;
 	pointer-events: none;
+}
+
+/* DROPDOWN */
+.dropbtn {
+    border: none;
+    cursor: pointer;
+    height: var(--icon-lg);
+    width: var(--icon-lg);
+    border-radius: var(--border-radius);
+    display: inline-block;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* vertically align icon.dropbtn */
+i.dropbtn::before {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: inherit;
+}
+
+.dropdown-content {
+    display: none;
+    border-radius: var(--border-radius);
+    position: absolute;
+    background-color: var(--background);
+    min-width: 160px;
+	box-shadow: var(--box-shadow);
+    z-index: 1;
+}
+
+.dropdown-content div {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-decoration: none;
+    display: block;
+    border-radius: inherit;
+    margin: var(--spacing-xxs);
+}
+
+.dropdown-content div:hover {
+    background-color: var(--hover-color);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: var(--grey);
+}
+
+.project.active .dropdown:hover .dropbtn {
+    background-color: var(--dark-grey);
+}
+
+.sidebar.collapse .dropdown,
+.sidebar.collapse .dropdown-content {
+    display: none;
 }
