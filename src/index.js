@@ -110,17 +110,36 @@ const DOMController = (function ()
                     throw new Error(`No stored item for this key: ${ IDElement.id }`);
                 stored.name = textEl.innerText;
                 Storage.setItem(localStorage, stored.id, stored);
+
                 console.log(`renamed project to ${ stored.name }`);
                 textEl.contentEditable = false;
             }
         })
     }
 
+    function deleteProject(element)
+    {
+        let IDElement = findParentElByClass(element, "project");
+        if (!IDElement)
+            throw new Error(`Could not find <button class="project">`);
+        // update database
+        const stored = Storage.getItem(localStorage, IDElement.id);
+        console.log(stored.name);
+        if (!stored)
+            throw new Error(`No stored item for this key: ${ IDElement.id }`);
+        Storage.removeItem(localStorage, IDElement.id);
+    }
+
     document.addEventListener("click", event =>
     {
         try
         {
-            if (event.target.closest(".rename-project"))
+            if (event.target.closest(".delete-project"))
+            {
+                deleteProject(event.target);
+                updateScreen(localStorage);
+            }
+            else if (event.target.closest(".rename-project"))
             {
                 renameProject(event.target);
             }

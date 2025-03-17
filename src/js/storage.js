@@ -30,6 +30,11 @@ export function clear(list)
     list.clear();
 }
 
+export function removeItem(list, key)
+{
+    list.removeItem(key);
+}
+
 export function setItem(list, key, value)
 {
     list.setItem(key, JSON.stringify(value));
