@@ -79,6 +79,8 @@ const DOMController = (function ()
 
     function findParentElByClass(element, className)
     {
+        if (!(element instanceof HTMLElement))
+            throw new Error(`Not a HTMLElement ${IDElement}`);
         if (!element.classList.contains(className))
         {
             while (!element.classList.contains(className))
@@ -89,11 +91,10 @@ const DOMController = (function ()
         return (element);
     }
 
-    function renameProject(element)
+    function renameProject(IDElement)
     {
-        let IDElement = findParentElByClass(element, "project");
-        if (!IDElement)
-            throw new Error(`Could not find <button class="project">`);
+        if (!(IDElement instanceof HTMLElement))
+            throw new Error(`Not a HTMLElement ${IDElement}`);
         let textEl = IDElement.querySelector(".project-text");
         if (!textEl)
             throw new Error(`Could not find class="project-text"`);
@@ -117,11 +118,10 @@ const DOMController = (function ()
         })
     }
 
-    function deleteProject(element)
+    function deleteProject(IDElement)
     {
-        let IDElement = findParentElByClass(element, "project");
-        if (!IDElement)
-            throw new Error(`Could not find <button class="project">`);
+        if (!(IDElement instanceof HTMLElement))
+            throw new Error(`Not a HTMLElement ${IDElement}`);
         // update database
         const stored = Storage.getItem(localStorage, IDElement.id);
         if (!stored)
@@ -131,7 +131,6 @@ const DOMController = (function ()
 
     function saveProject()
     {
-
         const IDElement = document.querySelector(".project.active");
         if (!IDElement)
             throw new Error(`No active project`);
@@ -142,17 +141,13 @@ const DOMController = (function ()
         Storage.setItem(localStorage, stored.id, stored);
     }
 
-    function openProject(element)
+    function openProject(IDElement)
     {
-
-        let IDElement = findParentElByClass(element, "project");
-        if (!IDElement)
-            throw new Error(`Could not find <button class="project">`);
-
-        // put the 'active' class only on this project
+        if (!(IDElement instanceof HTMLElement))
+            throw new Error(`Not a HTMLElement ${IDElement}`);
+        // put the 'active' class only here and nowhere else
         removeActiveClasses();
-        if (!(IDElement.classList.contains("active")))
-            IDElement.classList.add("active");
+        IDElement.classList.add("active");
 
         // query database
         const stored = Storage.getItem(localStorage, IDElement.id);
@@ -160,6 +155,7 @@ const DOMController = (function ()
             throw new Error(`No stored item for this key: ${ IDElement.id }`);
 
         view(editor, stored.content)
+        editor.contentEditable = true;
     }
 
     document.addEventListener("click", event =>
@@ -168,12 +164,17 @@ const DOMController = (function ()
         {
             if (event.target.closest(".delete-project"))
             {
-                deleteProject(event.target);
+                let IDElement = findParentElByClass(event.target, "project");
+                deleteProject(IDElement);
+                editor.contentEditable = false;
                 updateScreen(localStorage);
             }
             else if (event.target.closest(".rename-project"))
             {
-                renameProject(event.target);
+                let IDElement = findParentElByClass(event.target, "project");
+                if (!IDElement)
+                    throw new Error(`Could not find <button class="project">`);
+                renameProject(IDElement);
             }
             else if (event.target.closest("#addNewProject"))
             {
@@ -198,7 +199,10 @@ const DOMController = (function ()
             }
             else if (event.target.closest("button.project"))
             {
-                openProject(event.target);
+                let IDElement = findParentElByClass(event.target, "project");
+                if (!IDElement)
+                    throw new Error(`Could not find <button class="project">`);
+                openProject(IDElement);
             }
             else;
         }

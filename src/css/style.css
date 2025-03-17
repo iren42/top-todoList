@@ -9,6 +9,16 @@
 	padding: 0;
 }
 
+.editor[contentEditable=true]:empty:not(:focus):before {
+	content: attr(data-text);
+	color: var(--dark-grey);
+}
+
+.editor[contentEditable=false]:before {
+	content: attr(data-default);
+	color: var(--dark-grey);
+}
+
 html,
 body {
 	min-height: 100%;
