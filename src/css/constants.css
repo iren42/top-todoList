@@ -30,6 +30,8 @@
 	--grey: #D7D7D9;
 	--light-grey: #E8E9EB;
 	--dark-grey: #AFAFB0;
+	--blue: #0087af;
+
     /* --darker-grey: #A4A5A6; */
 	--foreground: var(--dark);
 	--background: var(--light);

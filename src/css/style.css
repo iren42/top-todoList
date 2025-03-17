@@ -30,6 +30,10 @@ li {
 	list-style-type: none;
 }
 
+i {
+	color: var(--dark-grey);
+}
+
 button {
 	cursor: pointer;
 	border-radius: var(--border-radius);
@@ -91,6 +95,7 @@ footer {
 .logo-name__name {
 	margin-left: var(--spacing-xs);
 	white-space: nowrap;
+	color: var(--dark-grey);
 }
 
 .logo-name__button {
@@ -259,6 +264,7 @@ i.dropbtn::before {
 
 .project.active .dropdown:hover .dropbtn {
     background-color: var(--dark-grey);
+	color: var(--foreground);
 }
 
 .sidebar.collapse .dropdown,
