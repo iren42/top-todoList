@@ -124,10 +124,42 @@ const DOMController = (function ()
             throw new Error(`Could not find <button class="project">`);
         // update database
         const stored = Storage.getItem(localStorage, IDElement.id);
-        console.log(stored.name);
         if (!stored)
             throw new Error(`No stored item for this key: ${ IDElement.id }`);
         Storage.removeItem(localStorage, IDElement.id);
+    }
+
+    function saveProject()
+    {
+
+        const IDElement = document.querySelector(".project.active");
+        if (!IDElement)
+            throw new Error(`No active project`);
+        const stored = Storage.getItem(localStorage, IDElement.id);
+        if (!stored)
+            throw new Error(`No stored item for this key: ${ IDElement.id }`);
+        stored.content = editor.innerText;
+        Storage.setItem(localStorage, stored.id, stored);
+    }
+
+    function openProject(element)
+    {
+
+        let IDElement = findParentElByClass(element, "project");
+        if (!IDElement)
+            throw new Error(`Could not find <button class="project">`);
+
+        // put the 'active' class only on this project
+        removeActiveClasses();
+        if (!(IDElement.classList.contains("active")))
+            IDElement.classList.add("active");
+
+        // query database
+        const stored = Storage.getItem(localStorage, IDElement.id);
+        if (!stored)
+            throw new Error(`No stored item for this key: ${ IDElement.id }`);
+
+        view(editor, stored.content)
     }
 
     document.addEventListener("click", event =>
@@ -149,14 +181,9 @@ const DOMController = (function ()
                 const newProject = new Project();
 
                 Storage.setItem(localStorage, newProject.id, newProject);
-
-                view(editor, newProject.content);
-
                 updateScreen(localStorage);
-                const button = document.querySelector(`#${ CSS.escape(newProject.id) }`);
-                if (!button)
-                    throw new Error(`Project's ID ${ newProject.id } not found in DOM`);
-                button.classList.add("active");
+
+                openProject(document.querySelector(`#${ CSS.escape(newProject.id) }`));
             }
             else if (event.target.closest("#clearBtn"))
             {
@@ -167,27 +194,11 @@ const DOMController = (function ()
             else if (event.target.closest("#saveBtn"))
             {
                 console.log("saving");
-                const key = document.querySelector(".project.active").id;
-                if (!key)
-                    throw new Error(`Active project does not have an ID`);
-                const stored = Storage.getItem(localStorage, key);
-                if (!stored)
-                    throw new Error(`No stored item for this key: ${ key }`);
-                stored.content = editor.innerText;
-                Storage.setItem(localStorage, stored.id, stored);
+                saveProject();
             }
             else if (event.target.closest("button.project"))
             {
-                let target = findParentElByClass(event.target, "project");
-                if (!target)
-                    throw new Error(`Could not find <button class="project">`);
-                removeActiveClasses();
-                if (!(target.classList.contains("active")))
-                    target.classList.add("active");
-                const stored = Storage.getItem(localStorage, target.id);
-                if (!stored)
-                    throw new Error(`No stored item for this key: ${ target.id }`);
-                view(editor, stored.content)
+                openProject(event.target);
             }
             else;
         }
