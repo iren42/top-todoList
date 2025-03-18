@@ -80,7 +80,7 @@ const DOMController = (function ()
     function findParentElByClass(element, className)
     {
         if (!(element instanceof HTMLElement))
-            throw new Error(`Not a HTMLElement ${IDElement}`);
+            throw new Error(`Not a HTMLElement ${element}`);
         if (!element.classList.contains(className))
         {
             while (!element.classList.contains(className))
@@ -129,11 +129,10 @@ const DOMController = (function ()
         Storage.removeItem(localStorage, IDElement.id);
     }
 
-    function saveProject()
+    function saveProject(IDElement)
     {
-        const IDElement = document.querySelector(".project.active");
-        if (!IDElement)
-            throw new Error(`No active project`);
+        if (!(IDElement instanceof HTMLElement))
+            throw new Error(`Not a HTMLElement ${IDElement}`);
         const stored = Storage.getItem(localStorage, IDElement.id);
         if (!stored)
             throw new Error(`No stored item for this key: ${ IDElement.id }`);
@@ -195,7 +194,10 @@ const DOMController = (function ()
             else if (event.target.closest("#saveBtn"))
             {
                 console.log("saving");
-                saveProject();
+                const IDElement = document.querySelector(".project.active");
+                if (!IDElement)
+                    throw new Error(`No active project`);
+                saveProject(IDElement);
             }
             else if (event.target.closest("button.project"))
             {
