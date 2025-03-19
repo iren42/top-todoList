@@ -1,3 +1,4 @@
+export const CHECKBOX_SEPARATOR = "box:";
 export const DOMCreator = (function ()
 {
     function project(name, iud)
@@ -44,13 +45,24 @@ export const DOMCreator = (function ()
     function todo(obj)
     {
         const li = document.createElement("li");
-        li.innerHTML = `
-        <div class="todo">
-            <input type="checkbox" id="box#${ obj.id }" name="todo" />
-            <label for="box#${ obj.id }">${ obj.title } + ${ obj.dueDate }</label>
+        const div = document.createElement("div");
+        div.classList.add("todo");
+
+        const form = document.createElement("form");
+        form.innerHTML = `
+            <label for="${CHECKBOX_SEPARATOR}${ obj.id }">${ obj.title } + ${ obj.dueDate }</label>
             <button type="button"><i class="fi fi-rr-plus-small"></i></button>
-        </div>
         `;
+
+        const checkbox = document.createElement("input");
+        checkbox.setAttribute("type", "checkbox");
+        checkbox.id = `${CHECKBOX_SEPARATOR}${obj.id}`;
+        checkbox.name = "todo";
+        checkbox.checked = obj.isCompleted;
+
+        li.append(div);
+        div.append(form);
+        form.prepend(checkbox);
         return (li);
     }
 

@@ -3,9 +3,9 @@ import "./css/style.css";
 import { marked } from "marked";
 import DOMPurify from 'dompurify';
 
-import { Project, TYPE_PROJECT } from "./js/Project.js"
-import { Todo, TYPE_TODO, TODO_PREFIX } from "./js/Todo.js";
-import { DOMCreator } from "./js/DOMCreator.js";
+import { Project, PROJECT_TYPE } from "./js/Project.js"
+import { Todo, TODO_TYPE, TODO_PREFIX } from "./js/Todo.js";
+import { CHECKBOX_SEPARATOR, DOMCreator } from "./js/DOMCreator.js";
 import *  as Storage from "./js/storage.js";
 
 if (process.env.NODE_ENV !== 'production')
@@ -62,7 +62,7 @@ const DOMController = (function ()
             const key = list.key(i);
             // console.log(`key: ${ key }`);
             const stored = Storage.getItem(list, key);
-            if (stored.type === TYPE_PROJECT)
+            if (stored.type === PROJECT_TYPE)
             {
                 const li = DOMCreator.project(stored.name, stored.id);
                 projectListDiv.append(li);
@@ -142,7 +142,7 @@ const DOMController = (function ()
     {
         const IDElement = document.querySelector(`#${ CSS.escape(projectObj.id) }`);
 
-        // put the 'active' class only here and nowhere else
+        // only one 'active' HTMLelement
         removeActiveClasses();
         IDElement.classList.add("active");
 
@@ -183,7 +183,7 @@ const DOMController = (function ()
             const stored = Storage.getItem(database, key);
             if (!stored)
                 throw new Error(`No stored item for this key: ${ key }`);
-            if (stored.type === TYPE_TODO && stored.projectID === projectObj.id)
+            if (stored.type === TODO_TYPE && stored.projectID === projectObj.id)
             {
                 console.log(`key: ${ key }`);
                 console.log(stored);
@@ -194,6 +194,29 @@ const DOMController = (function ()
         view(preview, ul);
     }
 
+    function saveTodo(todoObj, isChecked) {
+        if (todoObj.type !== TODO_TYPE)
+            return ;
+        todoObj.isCompleted = isChecked;
+        Storage.setItem(localStorage, todoObj.id, todoObj);
+    }
+
+    document.addEventListener("change", event =>
+    {
+        if (event.target.closest("input[type='checkbox'][name='todo']"))
+        {
+            if (!(event.target instanceof HTMLInputElement))
+                return;
+            if (!event.target.id)
+                throw new Error(`No id for this target: ${ event.target }`);
+            console.log("change state of checkbox to " + event.target.checked);
+            let key = event.target.id.substring(CHECKBOX_SEPARATOR.length);
+            const todo = Storage.getItem(localStorage, key);
+            if (!todo)
+                throw new Error(`No stored item for this key: ${ key }`);
+            saveTodo(todo, event.target.checked);
+        }
+    })
     document.addEventListener("click", event =>
     {
         try

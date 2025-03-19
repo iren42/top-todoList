@@ -1,4 +1,4 @@
-export const TYPE_PROJECT = "PROJECT";
+export const PROJECT_TYPE = "PROJECT";
 export function Project(name = "New project", creationDate = new Date())
 {
     this.id = uid();
@@ -6,7 +6,7 @@ export function Project(name = "New project", creationDate = new Date())
     this.content = "";
     this.lastEditDate = creationDate;
     this.creationDate = creationDate;
-    this.type = TYPE_PROJECT;
+    this.type = PROJECT_TYPE;
 }
 
 function uid()
