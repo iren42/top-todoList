@@ -1,10 +1,10 @@
 import "./css/normalize.css";
 import "./css/style.css";
-import "./css/main.css";
 import { marked } from "marked";
 import DOMPurify from 'dompurify';
 
-import { Project } from "./js/Project.js"
+import { Project, TYPE_PROJECT } from "./js/Project.js"
+import { Todo, TYPE_TODO, TODO_PREFIX } from "./js/Todo.js";
 import { DOMCreator } from "./js/DOMCreator.js";
 import *  as Storage from "./js/storage.js";
 
@@ -35,10 +35,6 @@ if (process.env.NODE_ENV !== 'production')
 
 const editor = document.querySelector(".editor");
 const preview = document.querySelector(".preview");
-editor.addEventListener("input", event =>
-{
-    // preview.innerHTML = DOMPurify.sanitize(marked.parse(editor.innerText));
-})
 
 const DOMController = (function ()
 {
@@ -53,7 +49,7 @@ const DOMController = (function ()
         }
     }
 
-    function updateScreen(list)
+    function updateSidebar(list)
     {
         console.log("load my project list, " + list.length);
         const projectListDiv = document.querySelector(".projectList");
@@ -64,10 +60,13 @@ const DOMController = (function ()
         for (let i = 0; i < list.length; i++)
         {
             const key = list.key(i);
-            console.log(`key: ${ key }`);
-            const stored = Storage.getItem(localStorage, key);
-            const li = DOMCreator.project(stored.name, stored.id);
-            projectListDiv.append(li);
+            // console.log(`key: ${ key }`);
+            const stored = Storage.getItem(list, key);
+            if (stored.type === TYPE_PROJECT)
+            {
+                const li = DOMCreator.project(stored.name, stored.id);
+                projectListDiv.append(li);
+            }
         }
     }
 
@@ -80,7 +79,7 @@ const DOMController = (function ()
     function findParentElByClass(element, className)
     {
         if (!(element instanceof HTMLElement))
-            throw new Error(`Not a HTMLElement ${element}`);
+            throw new Error(`Not a HTMLElement ${ element }`);
         if (!element.classList.contains(className))
         {
             while (!element.classList.contains(className))
@@ -94,7 +93,7 @@ const DOMController = (function ()
     function renameProject(IDElement)
     {
         if (!(IDElement instanceof HTMLElement))
-            throw new Error(`Not a HTMLElement ${IDElement}`);
+            throw new Error(`Not a HTMLElement ${ IDElement }`);
         let textEl = IDElement.querySelector(".project-text");
         if (!textEl)
             throw new Error(`Could not find class="project-text"`);
@@ -121,7 +120,7 @@ const DOMController = (function ()
     function deleteProject(IDElement)
     {
         if (!(IDElement instanceof HTMLElement))
-            throw new Error(`Not a HTMLElement ${IDElement}`);
+            throw new Error(`Not a HTMLElement ${ IDElement }`);
         // update database
         const stored = Storage.getItem(localStorage, IDElement.id);
         if (!stored)
@@ -129,32 +128,70 @@ const DOMController = (function ()
         Storage.removeItem(localStorage, IDElement.id);
     }
 
-    function saveProject(IDElement)
+    function saveProject(database, obj)
     {
-        if (!(IDElement instanceof HTMLElement))
-            throw new Error(`Not a HTMLElement ${IDElement}`);
-        const stored = Storage.getItem(localStorage, IDElement.id);
-        if (!stored)
-            throw new Error(`No stored item for this key: ${ IDElement.id }`);
-        stored.content = editor.innerText;
-        Storage.setItem(localStorage, stored.id, stored);
+        if (!(obj instanceof Object))
+            throw new Error(`Not an Object ${ obj }`);
+        if (!editor)
+            throw new Error(`No editor div`);
+        obj.content = editor.innerText;
+        Storage.setItem(database, obj.id, obj);
     }
 
-    function openProject(IDElement)
+    function openProject(projectObj)
     {
-        if (!(IDElement instanceof HTMLElement))
-            throw new Error(`Not a HTMLElement ${IDElement}`);
+        const IDElement = document.querySelector(`#${ CSS.escape(projectObj.id) }`);
+
         // put the 'active' class only here and nowhere else
         removeActiveClasses();
         IDElement.classList.add("active");
 
-        // query database
-        const stored = Storage.getItem(localStorage, IDElement.id);
-        if (!stored)
-            throw new Error(`No stored item for this key: ${ IDElement.id }`);
-
-        view(editor, stored.content)
+        view(editor, projectObj.content)
         editor.contentEditable = true;
+    }
+
+    function isTodo(str)
+    {
+        if (!(typeof str === "string"))
+            return (false);
+        if (str.indexOf(TODO_PREFIX) !== 0)
+            return (false);
+        return (true);
+    }
+
+    function createTodoList(database, projectObj)
+    {
+        let lines = projectObj.content.split("\n");
+        for (let i = 0; i < lines.length; i++)
+        {
+            if (isTodo(lines[i])) 
+            {
+                let title = lines[i].substring(TODO_PREFIX.length);
+                const todo = new Todo(projectObj.id, i, title);
+                Storage.setItem(database, todo.id, todo);
+            }
+        }
+    }
+
+    function openTodoList(database, projectObj)
+    {
+        const ul = document.createElement("ul");
+
+        for (let i = 0; i < database.length; i++)
+        {
+            const key = database.key(i);
+            const stored = Storage.getItem(database, key);
+            if (!stored)
+                throw new Error(`No stored item for this key: ${ key }`);
+            if (stored.type === TYPE_TODO && stored.projectID === projectObj.id)
+            {
+                console.log(`key: ${ key }`);
+                console.log(stored);
+                const li = DOMCreator.todo(stored);
+                ul.append(li);
+            }
+        }
+        view(preview, ul);
     }
 
     document.addEventListener("click", event =>
@@ -166,7 +203,7 @@ const DOMController = (function ()
                 let IDElement = findParentElByClass(event.target, "project");
                 deleteProject(IDElement);
                 editor.contentEditable = false;
-                updateScreen(localStorage);
+                updateSidebar(localStorage);
             }
             else if (event.target.closest(".rename-project"))
             {
@@ -181,15 +218,14 @@ const DOMController = (function ()
                 const newProject = new Project();
 
                 Storage.setItem(localStorage, newProject.id, newProject);
-                updateScreen(localStorage);
-
-                openProject(document.querySelector(`#${ CSS.escape(newProject.id) }`));
+                updateSidebar(localStorage);
+                openProject(newProject);
             }
             else if (event.target.closest("#clearBtn"))
             {
                 console.log("clear data");
                 Storage.clear(localStorage);
-                updateScreen(localStorage);
+                updateSidebar(localStorage);
             }
             else if (event.target.closest("#saveBtn"))
             {
@@ -197,14 +233,27 @@ const DOMController = (function ()
                 const IDElement = document.querySelector(".project.active");
                 if (!IDElement)
                     throw new Error(`No active project`);
-                saveProject(IDElement);
+                const projectObj = Storage.getItem(localStorage, IDElement.id);
+                if (!projectObj)
+                    throw new Error(`No stored item for this key: ${ IDElement.id }`);
+
+                saveProject(localStorage, projectObj);
+                createTodoList(localStorage, projectObj);
+                openTodoList(localStorage, projectObj);
             }
             else if (event.target.closest("button.project"))
             {
                 let IDElement = findParentElByClass(event.target, "project");
                 if (!IDElement)
                     throw new Error(`Could not find <button class="project">`);
-                openProject(IDElement);
+
+                // query database
+                const projectObj = Storage.getItem(localStorage, IDElement.id);
+                if (!projectObj)
+                    throw new Error(`No stored item for this key: ${ IDElement.id }`);
+
+                openProject(projectObj);
+                openTodoList(localStorage, projectObj);
             }
             else;
         }
@@ -214,9 +263,9 @@ const DOMController = (function ()
         }
     });
 
-    updateScreen(localStorage);
+    updateSidebar(localStorage);
 
     return ({
-        updateScreen,
+        updateSidebar,
     })
 })();

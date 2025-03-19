@@ -34,10 +34,10 @@
 		width: 100%;
 		padding: var(--spacing-xs);
 		white-space: pre-wrap;
-		display: inline-block;
+		display: block;
 	}
+}
 
-	& .preview * {
-		all: revert;
-	}
+.todo {
+	background-color: orange;
 }

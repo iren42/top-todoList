@@ -1,5 +1,6 @@
 @import "~@flaticon/flaticon-uicons/css/all/all";
 @import './constants.css';
+@import './main.css';
 
 *,
 *::before,
@@ -36,7 +37,7 @@ span {
 	line-height: var(--lh);
 }
 
-li {
+ul {
 	list-style-type: none;
 }
 

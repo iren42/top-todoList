@@ -40,7 +40,22 @@ export const DOMCreator = (function ()
         li.append(button);
         return (li);
     }
+
+    function todo(obj)
+    {
+        const li = document.createElement("li");
+        li.innerHTML = `
+        <div class="todo">
+            <input type="checkbox" id="box#${ obj.id }" name="todo" />
+            <label for="box#${ obj.id }">${ obj.title } + ${ obj.dueDate }</label>
+            <button type="button"><i class="fi fi-rr-plus-small"></i></button>
+        </div>
+        `;
+        return (li);
+    }
+
     return ({
-        project
+        project,
+        todo
     })
 })();
