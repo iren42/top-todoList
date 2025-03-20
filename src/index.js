@@ -90,33 +90,6 @@ const DOMController = (function ()
         return (element);
     }
 
-    function renameProject(IDElement)
-    {
-        if (!(IDElement instanceof HTMLElement))
-            throw new Error(`Not a HTMLElement ${ IDElement }`);
-        let textEl = IDElement.querySelector(".project-text");
-        if (!textEl)
-            throw new Error(`Could not find class="project-text"`);
-        textEl.contentEditable = true;
-        textEl.focus();
-        textEl.addEventListener("keydown", event =>
-        {
-            if (event.key === "Enter")
-            {
-                event.preventDefault();
-                // update database
-                const stored = Storage.getItem(localStorage, IDElement.id);
-                if (!stored)
-                    throw new Error(`No stored item for this key: ${ IDElement.id }`);
-                stored.name = textEl.innerText;
-                Storage.setItem(localStorage, stored.id, stored);
-
-                console.log(`renamed project to ${ stored.name }`);
-                textEl.contentEditable = false;
-            }
-        })
-    }
-
     function deleteProject(IDElement)
     {
         if (!(IDElement instanceof HTMLElement))
@@ -194,12 +167,54 @@ const DOMController = (function ()
         view(preview, ul);
     }
 
-    function saveTodo(todoObj, isChecked) {
+    function saveTodo(todoObj, isChecked)
+    {
         if (todoObj.type !== TODO_TYPE)
-            return ;
+            return;
         todoObj.isCompleted = isChecked;
         Storage.setItem(localStorage, todoObj.id, todoObj);
     }
+
+    function renameProject(database, IDElement)
+    {
+        // update database
+        const stored = Storage.getItem(database, IDElement.id);
+        if (!stored)
+            throw new Error(`No stored item for this key: ${ IDElement.id }`);
+        let textEl = IDElement.querySelector(".project-text");
+        if (!textEl)
+            throw new Error(`Could not find class="project-text"`);
+        stored.name = textEl.innerText;
+        Storage.setItem(database, stored.id, stored);
+
+        console.log(`renamed project to ${ stored.name }`);
+    }
+
+    const projectListDiv = document.querySelector("ul.projectList");
+    projectListDiv.addEventListener("focusout", event =>
+    {
+        if (event.target.closest(".project-text"))
+        {
+            let IDElement = findParentElByClass(event.target, "project");
+            if (!IDElement)
+                throw new Error(`Could not find <button class="project">`);
+            renameProject(localStorage, IDElement);
+            event.target.contentEditable = false;
+        }
+    })
+
+    projectListDiv.addEventListener("keydown", event =>
+    {
+        if (event.key === "Enter" && event.target.closest(".project-text"))
+        {
+            event.preventDefault();
+            let IDElement = findParentElByClass(event.target, "project");
+            if (!IDElement)
+                throw new Error(`Could not find <button class="project">`);
+            renameProject(localStorage, IDElement);
+            event.target.contentEditable = false;
+        }
+    })
 
     document.addEventListener("change", event =>
     {
@@ -217,6 +232,7 @@ const DOMController = (function ()
             saveTodo(todo, event.target.checked);
         }
     })
+
     document.addEventListener("click", event =>
     {
         try
@@ -233,7 +249,11 @@ const DOMController = (function ()
                 let IDElement = findParentElByClass(event.target, "project");
                 if (!IDElement)
                     throw new Error(`Could not find <button class="project">`);
-                renameProject(IDElement);
+                let textEl = IDElement.querySelector(".project-text");
+                if (!textEl)
+                    throw new Error(`Could not find class="project-text"`);
+                textEl.contentEditable = true;
+                textEl.focus();
             }
             else if (event.target.closest("#addNewProject"))
             {
