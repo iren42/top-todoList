@@ -81,12 +81,30 @@ export const projectController = (function ()
         todoController.update(database, key, isChecked);
     }
 
+    function rename(database, key, newName)
+    {
+        const stored = Storage.getItem(database, key);
+        if (!stored)
+            throw new Error(`No stored item for this key: ${ key }`);
+
+        stored.name = newName;
+        Storage.setItem(database, stored.id, stored);
+        console.log(`renamed project to ${ stored.name }`);
+    }
+
+    function clearAll(database)
+    {
+        Storage.clear(database);
+    }
+
     return ({
         createTodoList,
         updateTodoList,
         create,
         update,
         get,
-        deleteP
+        deleteP,
+        clearAll,
+        rename
     })
 })();

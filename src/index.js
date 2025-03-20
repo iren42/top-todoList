@@ -4,7 +4,6 @@ import DOMPurify from 'dompurify';
 
 import { projectController } from "./js/Project.js"
 import { CHECKBOX_SEPARATOR, DOMCreator } from "./js/DOMCreator.js";
-import *  as Storage from "./js/storage.js";
 
 if (process.env.NODE_ENV !== 'production')
 {
@@ -90,18 +89,17 @@ const DOMController = (function ()
         // view(preview, ul);
     }
 
-    function renameProject(database, IDElement)
+    function renameProject(eventTarget)
     {
-        const stored = Storage.getItem(database, IDElement.id);
-        if (!stored)
-            throw new Error(`No stored item for this key: ${ IDElement.id }`);
+        let IDElement = findParentElByClass(eventTarget, "project");
+        if (!IDElement)
+            throw new Error(`Could not find <button class="project">`);
         let textEl = IDElement.querySelector(".project-text");
         if (!textEl)
             throw new Error(`Could not find class="project-text"`);
 
-        stored.name = textEl.innerText;
-        Storage.setItem(database, stored.id, stored);
-        console.log(`renamed project to ${ stored.name }`);
+        projectController.rename(localStorage, IDElement.id, textEl.innerText);
+        eventTarget.contentEditable = false;
     }
 
     const projectListDiv = document.querySelector("ul.projectList");
@@ -109,12 +107,7 @@ const DOMController = (function ()
     {
         if (event.target.closest(".project-text"))
         {
-            let IDElement = findParentElByClass(event.target, "project");
-            if (!IDElement)
-                throw new Error(`Could not find <button class="project">`);
-
-            renameProject(localStorage, IDElement);
-            event.target.contentEditable = false;
+            renameProject(event.target);
         }
     })
 
@@ -123,12 +116,7 @@ const DOMController = (function ()
         if (event.key === "Enter" && event.target.closest(".project-text"))
         {
             event.preventDefault();
-            let IDElement = findParentElByClass(event.target, "project");
-            if (!IDElement)
-                throw new Error(`Could not find <button class="project">`);
-
-            renameProject(localStorage, IDElement);
-            event.target.contentEditable = false;
+            renameProject(event.target);
         }
     })
 
@@ -185,7 +173,7 @@ const DOMController = (function ()
         {
             console.log("clear data");
             clearAll();
-            Storage.clear(localStorage);
+            projectController.clearAll(localStorage);
             DOMCreator.updateSidebar(localStorage);
         }
         else if (event.target.closest("#saveBtn"))
@@ -210,7 +198,7 @@ const DOMController = (function ()
                 throw new Error(`Could not find <button class="project">`);
 
             // query database
-            const projectObj = Storage.getItem(localStorage, IDElement.id);
+            const projectObj = projectController.get(localStorage, IDElement.id);
             if (!projectObj)
                 throw new Error(`No stored item for this key: ${ IDElement.id }`);
 
