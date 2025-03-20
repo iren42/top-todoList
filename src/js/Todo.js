@@ -22,8 +22,8 @@ export const todoController = (function ()
 {
     function create(database, projectID, lineNumber, title)
     {
-                    const todo = new Todo(projectID, lineNumber, title);
-                Storage.setItem(database, todo.id, todo);
+        const todo = new Todo(projectID, lineNumber, title);
+        Storage.setItem(database, todo.id, todo);
     }
 
     function update(database, key, isChecked)

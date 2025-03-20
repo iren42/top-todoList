@@ -33,16 +33,14 @@ export const projectController = (function ()
         let lines = projectObj.content.split("\n");
         for (let i = 0; i < lines.length; i++)
         {
-            if (isTodo(lines[i]))
-            {
-                const title = lines[i].substring(TODO_PREFIX.length);
-                const key = todoController.getKey(i, projectObj.id);
+            if (!isTodo(lines[i]))
+                continue;
+            const title = lines[i].substring(TODO_PREFIX.length);
+            const key = todoController.getKey(i, projectObj.id);
 
-                // check is todo already exists
-                let todo = Storage.getItem(database, key);
-                if (!todo)
-                    todoController.create(database, projectObj.id, i, title);
-            }
+            let todo = Storage.getItem(database, key);
+            if (!todo)
+                todoController.create(database, projectObj.id, i, title);
         }
     }
 
