@@ -1,6 +1,28 @@
+import *  as Storage from "./storage.js";
+import {  TODO_TYPE } from "./Todo.js";
+import {  PROJECT_TYPE } from "./Project.js"
+
 export const CHECKBOX_SEPARATOR = "box:";
 export const DOMCreator = (function ()
 {
+    function updateSidebar(database)
+    {
+        const projectListDiv = document.querySelector(".projectList");
+        projectListDiv.innerHTML = "";
+
+        for (let i = 0; i < database.length; i++)
+        {
+            const key = database.key(i);
+            // console.log(`key: ${ key }`);
+            const stored = Storage.getItem(database, key);
+            if (stored.type === PROJECT_TYPE)
+            {
+                const li = project(stored.name, stored.id);
+                projectListDiv.append(li);
+            }
+        }
+    }
+
     function project(name, iud)
     {
         const li = document.createElement("li");
@@ -51,14 +73,19 @@ export const DOMCreator = (function ()
         const form = document.createElement("form");
         form.innerHTML = `
             <label for="${CHECKBOX_SEPARATOR}${ obj.id }">${ obj.title } + ${ obj.dueDate }</label>
-            <button type="button"><i class="fi fi-rr-plus-small"></i></button>
+            <button type="button" class="expand-todo"><i class="fi fi-rr-plus-small"></i></button>
+            <div class="description" contentEditable=true>${obj.description}</div>
+            <div class="priority" contentEditable=true>${obj.priority}</div>
+
+            <button type="submit" class="save-todo">Save</button>
+            <button type="button" class="delete-todo">Delete</button>
         `;
 
         const checkbox = document.createElement("input");
         checkbox.setAttribute("type", "checkbox");
         checkbox.id = `${CHECKBOX_SEPARATOR}${obj.id}`;
         checkbox.name = "todo";
-        checkbox.checked = obj.isCompleted;
+        checkbox.checked = obj.isChecked;
 
         li.append(div);
         div.append(form);
@@ -66,8 +93,32 @@ export const DOMCreator = (function ()
         return (li);
     }
 
+    function updateTodoList(database, projectID)
+    {
+        const preview = document.querySelector(".preview");
+        preview.innerHTML = "";
+        const ul = document.createElement("ul");
+        ul.classList.add("todoList");
+
+        for (let i = 0; i < database.length; i++)
+        {
+            const key = database.key(i);
+            const stored = Storage.getItem(database, key);
+            if (!stored)
+                throw new Error(`No stored item for this key: ${ key }`);
+            if (stored.type === TODO_TYPE && stored.projectID === projectID)
+            {
+                console.log(`key: ${ key }`);
+                console.log(stored);
+                const li = todo(stored);
+                ul.append(li);
+            }
+        }
+        preview.append(ul);
+    }
+
     return ({
-        project,
-        todo
+        updateTodoList,
+        updateSidebar
     })
 })();

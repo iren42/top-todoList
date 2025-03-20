@@ -1,13 +1,60 @@
+import *  as Storage from "./storage.js";
+
 export const TODO_TYPE = "TODO";
-const TODO_SEPARATOR = "#";
+
 export const TODO_PREFIX = "- [ ] ";
-export function Todo(projectID, lineNumber, title = "", dueDate = new Date() ) {
+
+const TODO_SEPARATOR = "#";
+
+export function Todo(projectID, lineNumber, title = "", dueDate = new Date())
+{
     this.type = TODO_TYPE;
     this.description = "";
     this.dueDate = dueDate;
     this.title = title;
-    this.id = `${lineNumber}${TODO_SEPARATOR}${projectID}`;
-    this.isCompleted = false;
+    this.id = todoController.getKey(lineNumber, projectID);
+    this.isChecked = false;
     this.priority = 0;
     this.projectID = projectID;
 }
+
+export const todoController = (function ()
+{
+    function create(database, projectID, lineNumber, title)
+    {
+                    const todo = new Todo(projectID, lineNumber, title);
+                Storage.setItem(database, todo.id, todo);
+    }
+
+    function update(database, key, isChecked)
+    {
+        const stored = Storage.getItem(database, key);
+        if (!stored)
+            return;
+        if (stored.type !== TODO_TYPE)
+            return;
+        stored.isChecked = isChecked;
+        Storage.setItem(database, key, stored);
+    }
+
+    function getKey(lineNumber, projectID)
+    {
+        return (`${ lineNumber }${ TODO_SEPARATOR }${ projectID }`);
+    }
+
+    function get(database, key)
+    {
+
+        const todo = Storage.getItem(database, key);
+        if (!todo)
+            return (null);
+        return (todo);
+    }
+
+    return ({
+        getKey,
+        create,
+        update,
+        get
+    });
+})();
