@@ -139,7 +139,10 @@ const DOMController = (function ()
     {
         if (event.target.closest(".expand-todo"))
         {
-            console.log("yes");
+            let IDElement = findParentElByClass(event.target, "todo");
+            if (!IDElement)
+                throw new Error(`Could not find element with class="todo">`);
+            IDElement.classList.toggle('collapse');
         }
         else if (event.target.closest(".delete-project"))
         {

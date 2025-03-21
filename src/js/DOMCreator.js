@@ -1,6 +1,6 @@
 import *  as Storage from "./storage.js";
-import {  TODO_TYPE } from "./Todo.js";
-import {  PROJECT_TYPE } from "./Project.js"
+import { TODO_TYPE } from "./Todo.js";
+import { PROJECT_TYPE } from "./Project.js"
 
 export const CHECKBOX_SEPARATOR = "box:";
 export const DOMCreator = (function ()
@@ -68,28 +68,36 @@ export const DOMCreator = (function ()
     {
         const li = document.createElement("li");
         const div = document.createElement("div");
-        div.classList.add("todo");
+        div.classList.add("todo", "collapse");
 
         const form = document.createElement("form");
         form.innerHTML = `
-            <label for="${CHECKBOX_SEPARATOR}${ obj.id }">${ obj.title } + ${ obj.dueDate }</label>
-            <button type="button" class="expand-todo"><i class="fi fi-rr-plus-small"></i></button>
-            <div class="description" contentEditable=true>${obj.description}</div>
-            <div class="priority" contentEditable=true>${obj.priority}</div>
+            <div class="description" contentEditable=true>${ obj.description }</div>
+            <div class="priority" contentEditable=true>${ obj.priority }</div>
 
+            <div class="wrapper">
             <button type="submit" class="save-todo">Save</button>
             <button type="button" class="delete-todo">Delete</button>
+            </div>
         `;
 
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("mini");
+
+        wrapper.innerHTML = `
+            <label for="${ CHECKBOX_SEPARATOR }${ obj.id }">${ obj.title } + ${ obj.dueDate }</label>
+            <button type="button" class="expand-todo"><i class="fi fi-rr-plus-small"></i></button>
+        `;
         const checkbox = document.createElement("input");
         checkbox.setAttribute("type", "checkbox");
-        checkbox.id = `${CHECKBOX_SEPARATOR}${obj.id}`;
+        checkbox.id = `${ CHECKBOX_SEPARATOR }${ obj.id }`;
         checkbox.name = "todo";
         checkbox.checked = obj.isChecked;
 
         li.append(div);
         div.append(form);
-        form.prepend(checkbox);
+        form.prepend(wrapper);
+        wrapper.prepend(checkbox);
         return (li);
     }
 

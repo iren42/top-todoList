@@ -40,4 +40,16 @@
 
 .todo {
 	background-color: orange;
+	margin-bottom: var(--spacing-sm);
+
+	& .wrapper,
+	.mini {
+		display: flex;
+	}
+}
+
+.todo.collapse .wrapper,
+.todo.collapse .priority,
+.todo.collapse .description {
+	display: none;
 }
