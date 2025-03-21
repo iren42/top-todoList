@@ -144,7 +144,7 @@ const DOMController = (function ()
                 throw new Error(`Could not find element with class="todo">`);
             if (!IDElement.id)
                 throw new Error(`key`);
-            const projectID = IDElement.dataset.projectID;
+            const projectID = IDElement.dataset.projectid;
             if (!projectID)
                 throw new Error(`no project ID`);
             projectController.remove(localStorage, IDElement.id);
