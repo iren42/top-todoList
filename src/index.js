@@ -10,13 +10,13 @@ if (process.env.NODE_ENV !== 'production')
     console.log('Looks like we are in development mode!');
 }
 {
-    let updateSidebar = document.querySelector('.updateSidebar');
-    let arrowCollapse = document.querySelector('#collapse-updateSidebar-icon');
-    if (arrowCollapse && updateSidebar)
+    let sidebar = document.querySelector('.sidebar');
+    let arrowCollapse = document.querySelector('#collapse-sidebar-icon');
+    if (arrowCollapse && sidebar)
     {
         arrowCollapse.onclick = () =>
         {
-            updateSidebar.classList.toggle('collapse');
+            sidebar.classList.toggle('collapse');
             arrowCollapse.classList.toggle('collapse');
             if (arrowCollapse.classList.contains('collapse'))
             {
