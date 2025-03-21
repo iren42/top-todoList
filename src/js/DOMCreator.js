@@ -3,6 +3,9 @@ import { TODO_TYPE } from "./Todo.js";
 import { PROJECT_TYPE } from "./Project.js"
 
 export const CHECKBOX_SEPARATOR = "box:";
+const DESCRIPTION_SEPARATOR = "des:";
+const PRIORITY_SEPARATOR = "pri:";
+
 export const DOMCreator = (function ()
 {
     function updateSidebar(database)
@@ -73,17 +76,28 @@ export const DOMCreator = (function ()
         const form = document.createElement("form");
         form.classList.add("todo", "collapse");
         form.innerHTML = `
-            <div class="description" contentEditable=true>${ obj.description }</div>
-            <div class="priority" contentEditable=true>${ obj.priority }</div>
+            <label for="${ DESCRIPTION_SEPARATOR }${ obj.id }">Description:</label>
+            <textarea id="${ DESCRIPTION_SEPARATOR }${ obj.id }" name="description" rows="5" class="description" value="${ obj.description }"></textarea>
 
+            <fieldset>
+                <legend>Priority level:</legend>
+                <div class="priority">
+                    <input type="radio" id="1${ PRIORITY_SEPARATOR }${ obj.id }" name="priority" value="low" />
+                    <label for="1${ PRIORITY_SEPARATOR }${ obj.id }">Low</label>
+                    <input type="radio" id="2${ PRIORITY_SEPARATOR }${ obj.id }" name="priority" value="medium" />
+                    <label for="2${ PRIORITY_SEPARATOR }${ obj.id }">Medium</label>
+                    <input type="radio" id="3${ PRIORITY_SEPARATOR }${ obj.id }" name="priority" value="high" />
+                    <label for="3${ PRIORITY_SEPARATOR }${ obj.id }">High</label>
+                </div>
+            </fieldset>
             <div class="wrapper">
-            <button type="submit" class="save-todo">Save</button>
-            <button type="button" class="delete-todo">Delete</button>
+                <button type="submit" class="save-todo">Save</button>
+                <button type="button" class="delete-todo">Delete</button>
             </div>
         `;
 
         const wrapper = document.createElement("div");
-        wrapper.classList.add("mini");
+        wrapper.classList.add("min");
 
         wrapper.innerHTML = `
             <label for="${ CHECKBOX_SEPARATOR }${ obj.id }">${ obj.title }</label>

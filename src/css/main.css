@@ -42,13 +42,17 @@
 	border-radius: var(--border-radius);
 	margin-bottom: var(--spacing-sm);
 	border: 1px solid var(--blue);
+	overflow: hidden;
 	/* remove space between divs */
 	font-size: 0;
 
-	& div {
-		height: 100%;
-		display: block;
+	& * {
 		font-size: var(--font-size-md);
+	}
+
+	& > *:not(:first-child) {
+		padding: var(--spacing-xs);
+		width: 100%;
 	}
 
 	& .wrapper {
@@ -65,19 +69,58 @@
 		}
 	}
 
-	& .description,
-	.priority {
-		border: 1px solid var(--border-color);
+	.description {
+		margin-bottom: var(--spacing-xs);
+		background-color: var(--light);
 	}
 
-	& .description,
-	.priority,
-	.wrapper {
-		padding: var(--spacing-xs) var(--spacing-sm);
-		background-color: antiquewhite;
+	fieldset {
+		font-size: 0;
+		border-left: none;
+		border-right: none;
+
+		& * {
+			font-size: var(--font-size-md);
+		}
+
+		& .priority {
+			display: grid;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			grid-template-columns: repeat(3, 1fr);
+			grid-template-rows: 1fr 1fr;
+			grid-template-areas:
+				"radio1 radio2 radio3"
+				"label1 label2 label3";
+
+			& label:first-of-type {
+				grid-area: label1;
+			}
+
+			& label:nth-of-type(2) {
+				grid-area: label2;
+			}
+
+			& label:last-of-type {
+				grid-area: label3;
+			}
+
+			& input[value="low"] {
+				grid-area: radio1;
+			}
+
+			& input[value="medium"] {
+				grid-area: radio2;
+			}
+
+			& input[value="high"] {
+				grid-area: radio3;
+			}
+		}
 	}
 
-	& .mini {
+	& .min {
 		height: var(--todo-height-collapsed);
 		display: grid;
 		align-items: center;
@@ -87,7 +130,7 @@
 		column-gap: 0.5rem;
 		grid-template-areas:
 			"input label button"
-			". dueDate .";
+			". dueDate dueDate";
 
 		& input[type=checkbox] {
 			grid-area: input;
@@ -130,8 +173,6 @@
 	height: var(--todo-height-collapsed);
 }
 
-.todo.collapse .wrapper,
-.todo.collapse .priority,
-.todo.collapse .description {
+.todo.collapse > *:not(.min) {
 	display: none;
 }
