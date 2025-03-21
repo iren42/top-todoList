@@ -75,6 +75,8 @@ export const DOMCreator = (function ()
 
         const form = document.createElement("form");
         form.classList.add("todo", "collapse");
+        form.id = obj.id;
+        form.dataset.projectID = obj.projectID;
         form.innerHTML = `
             <label for="${ DESCRIPTION_SEPARATOR }${ obj.id }">Description:</label>
             <textarea id="${ DESCRIPTION_SEPARATOR }${ obj.id }" name="description" rows="5" class="description" value="${ obj.description }"></textarea>

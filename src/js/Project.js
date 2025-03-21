@@ -52,7 +52,7 @@ export const projectController = (function ()
     }
 
     // 'delete' is a reserved word
-    function deleteP(database, key)
+    function remove(database, key)
     {
         Storage.removeItem(database, key);
     }
@@ -101,7 +101,7 @@ export const projectController = (function ()
         create,
         update,
         get,
-        deleteP,
+        remove,
         clearAll,
         rename
     })

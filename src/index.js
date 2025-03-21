@@ -137,7 +137,20 @@ const DOMController = (function ()
 
     document.addEventListener("click", event =>
     {
-        if (event.target.closest(".expand-todo"))
+        if (event.target.closest(".delete-todo"))
+        {
+            let IDElement = findParentElByClass(event.target, "todo");
+            if (!IDElement)
+                throw new Error(`Could not find element with class="todo">`);
+            if (!IDElement.id)
+                throw new Error(`key`);
+            const projectID = IDElement.dataset.projectID;
+            if (!projectID)
+                throw new Error(`no project ID`);
+            projectController.remove(localStorage, IDElement.id);
+            DOMCreator.updateTodoList(localStorage, projectID);
+        }
+        else if (event.target.closest(".expand-todo"))
         {
             let IDElement = findParentElByClass(event.target, "todo");
             if (!IDElement)
@@ -150,7 +163,7 @@ const DOMController = (function ()
             if (!IDElement)
                 throw new Error(`Could not find <button class="project">`);
 
-            projectController.deleteP(localStorage, IDElement.id);
+            projectController.remove(localStorage, IDElement.id);
             clearAll();
             DOMCreator.updateSidebar(localStorage);
         }
