@@ -67,10 +67,11 @@ export const DOMCreator = (function ()
     function todo(obj)
     {
         const li = document.createElement("li");
-        const div = document.createElement("div");
-        div.classList.add("todo", "collapse");
+        // const div = document.createElement("div");
+        // div.classList.add("todo", "collapse");
 
         const form = document.createElement("form");
+        form.classList.add("todo", "collapse");
         form.innerHTML = `
             <div class="description" contentEditable=true>${ obj.description }</div>
             <div class="priority" contentEditable=true>${ obj.priority }</div>
@@ -85,8 +86,10 @@ export const DOMCreator = (function ()
         wrapper.classList.add("mini");
 
         wrapper.innerHTML = `
-            <label for="${ CHECKBOX_SEPARATOR }${ obj.id }">${ obj.title } + ${ obj.dueDate }</label>
-            <button type="button" class="expand-todo"><i class="fi fi-rr-plus-small"></i></button>
+            <label for="${ CHECKBOX_SEPARATOR }${ obj.id }">${ obj.title }</label>
+            <span class="dueDate">${ obj.dueDate }</span>
+            <button type="button" class="expand-todo"><i class="fi fi-tr-square-plus"></i>
+            </button>
         `;
         const checkbox = document.createElement("input");
         checkbox.setAttribute("type", "checkbox");
@@ -94,8 +97,7 @@ export const DOMCreator = (function ()
         checkbox.name = "todo";
         checkbox.checked = obj.isChecked;
 
-        li.append(div);
-        div.append(form);
+        li.append(form);
         form.prepend(wrapper);
         wrapper.prepend(checkbox);
         return (li);

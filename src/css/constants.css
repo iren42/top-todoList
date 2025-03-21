@@ -3,11 +3,15 @@
 	--max-width: 1024px;
 	--header-height: 5rem;
 	--header-height: 3rem;
+
 	--sidebar-width: 18rem;
 	--sidebar-width-collapsed: 5rem;
 
+	--todo-height-collapsed: 5rem;
+
 	--icon-lg: 1.8rem;
 	--icon-md: 1.5rem;
+	--icon-sm: 1.25rem;
 
 	--spacing-xxs: 0.25rem;
 	--spacing-xs: 0.5rem;
