@@ -67,6 +67,8 @@ export const projectController = (function ()
             let todo = Storage.getItem(database, key);
             if (!todo)
                 todoController.create(database, projectObj.id, i, title);
+            else
+                todoController.update(localStorage, todo, { title: title });
         }
     }
 

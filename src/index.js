@@ -167,6 +167,7 @@ const DOMController = (function ()
             throw new Error(ERROR.KEY(event.target.id));
         const formData = new FormData(event.target);
         projectController.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
+        console.log("save todo");
     })
 
     document.addEventListener("click", event =>
