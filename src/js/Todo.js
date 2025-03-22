@@ -1,5 +1,4 @@
 import *  as Storage from "./storage.js";
-import * as ERROR from "./error_constants.js"
 
 export const TODO_TYPE = "TODO";
 
@@ -11,11 +10,12 @@ export const PRIORITY_VAL1 = "low";
 export const PRIORITY_VAL2 = "medium";
 export const PRIORITY_VAL3 = "high";
 
-function Todo(projectID, lineNumber, title = "", dueDate = new Date())
+function Todo(projectID, lineNumber, title = "")
 {
     this.type = TODO_TYPE;
     this.description = "";
-    this.dueDate = dueDate;
+    this.dueDate = "";
+    this.dueTime = "";
     this.title = title;
     this.id = todoController.getKey(lineNumber, projectID);
     this.priority = PRIORITY_VAL1;

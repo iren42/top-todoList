@@ -166,6 +166,7 @@ const DOMController = (function ()
         if (!todoObj)
             throw new Error(ERROR.KEY(event.target.id));
         const formData = new FormData(event.target);
+        console.log(Object.fromEntries(formData));
         projectController.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
         console.log("save todo");
     })

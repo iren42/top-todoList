@@ -1,10 +1,13 @@
 import *  as Storage from "./storage.js";
 import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.js";
 import { PROJECT_TYPE } from "./Project.js"
+import { format } from "date-fns";
 
 const CHECKBOX_SEPARATOR = "box:";
 const DESCRIPTION_SEPARATOR = "des:";
 const PRIORITY_SEPARATOR = "pri:";
+const DUEDATE_SEPARATOR = "date:";
+const DUETIME_SEPARATOR = "time:";
 
 // in charge of reading and displaying
 export const DOMCreator = (function ()
@@ -80,6 +83,21 @@ export const DOMCreator = (function ()
             <label for="${ DESCRIPTION_SEPARATOR }${ obj.id }">Description:</label>
             <textarea id="${ DESCRIPTION_SEPARATOR }${ obj.id }" name="description" rows="5" class="description">${ obj.description }</textarea>
 
+            <label for="${DUEDATE_SEPARATOR}${obj.id}">Due date:</label>
+            <input
+            type="date"
+            id="${DUEDATE_SEPARATOR}${obj.id}"
+            value="${obj.dueDate}"
+            name="dueDate"
+            min="2020-01-01" />
+            <label for="${DUETIME_SEPARATOR}${obj.id}">Due time:</label>
+
+            <input
+            type="time"
+            id="${DUETIME_SEPARATOR}${obj.id}"
+            value="${obj.dueTime}"
+            name="dueTime" />
+
             <fieldset>
                 <legend>Priority level:</legend>
                 <div class="priority">
@@ -102,7 +120,7 @@ export const DOMCreator = (function ()
 
         wrapper.innerHTML = `
             <label for="${ CHECKBOX_SEPARATOR }${ obj.id }">${ obj.title }</label>
-            <span class="dueDate">${ obj.dueDate }</span>
+            <span class="dueDate">${ obj.dueDate } ${obj.dueTime}</span>
             <button type="button" class="expand-todo"><i class="fi fi-tr-square-plus"></i>
             </button>
         `;
