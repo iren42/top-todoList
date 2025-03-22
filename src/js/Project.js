@@ -88,7 +88,7 @@ export const projectController = (function ()
     {
         const projectObj = Storage.getItem(database, key);
         if (!projectObj)
-            return;
+            throw new Error(ERROR.KEY(key));
         if (projectObj.type !== PROJECT_TYPE)
             return;
         projectObj.content = newContent;

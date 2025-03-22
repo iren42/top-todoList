@@ -17,8 +17,9 @@ export const DOMCreator = (function ()
         for (let i = 0; i < database.length; i++)
         {
             const key = database.key(i);
-            // console.log(`key: ${ key }`);
             const stored = Storage.getItem(database, key);
+            if (!stored)
+                return;
             if (stored.type === PROJECT_TYPE)
             {
                 const li = project(stored.name, stored.id);
@@ -30,7 +31,6 @@ export const DOMCreator = (function ()
     function project(name, iud)
     {
         const li = document.createElement("li");
-        // li.classList.add("project");
 
         const button = document.createElement("button");
         button.type = "button";
@@ -71,8 +71,6 @@ export const DOMCreator = (function ()
     function todo(obj)
     {
         const li = document.createElement("li");
-        // const div = document.createElement("div");
-        // div.classList.add("todo", "collapse");
 
         const form = document.createElement("form");
         form.classList.add("todo", "collapse");
@@ -132,7 +130,7 @@ export const DOMCreator = (function ()
             const key = database.key(i);
             const stored = Storage.getItem(database, key);
             if (!stored)
-                throw new Error(`No stored item for this key: ${ key }`);
+                return;
             if (stored.type === TODO_TYPE && stored.projectID === projectID)
             {
                 const li = todo(stored);
