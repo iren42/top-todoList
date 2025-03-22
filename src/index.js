@@ -1,9 +1,8 @@
 import "./css/normalize.css";
 import "./css/style.css";
-import DOMPurify from 'dompurify';
 
 import { projectController } from "./js/Project.js"
-import { CHECKBOX_SEPARATOR, DOMCreator } from "./js/DOMCreator.js";
+import { DOMCreator } from "./js/DOMCreator.js";
 
 if (process.env.NODE_ENV !== 'production')
 {
@@ -34,6 +33,7 @@ const DOMController = (function ()
 {
     const editor = document.querySelector(".editor");
     const preview = document.querySelector(".preview");
+    const CONTENTEDITABLE = "plaintext-only";
 
     function clearAll()
     {
@@ -82,11 +82,17 @@ const DOMController = (function ()
         removeActiveClasses();
         IDElement.classList.add("active");
 
-        editor.contentEditable = true;
+        editor.contentEditable = CONTENTEDITABLE;
         view(editor, projectObj.content);
 
         DOMCreator.updateTodoList(localStorage, projectObj.id);
-        // view(preview, ul);
+    }
+
+    function removeBR(str)
+    {
+        if (!str.endsWith("\n"))
+            return (str);
+        return (str.slice(0, str.length - 1));
     }
 
     function renameProject(eventTarget)
@@ -129,8 +135,11 @@ const DOMController = (function ()
             if (!event.target.id)
                 throw new Error(`No id for this target: ${ event.target }`);
 
-            let key = event.target.id.substring(CHECKBOX_SEPARATOR.length);
-            projectController.updateTodoList(localStorage, key, event.target.checked);
+            let IDElement = findParentElByClass(event.target, "todo");
+            if (!IDElement)
+                throw new Error(`Could not find element with class="todo">`);
+            let todoKey = IDElement.id;
+            projectController.updateTodo(localStorage, todoKey, event.target.checked);
             console.log("change state of checkbox to " + event.target.checked);
         }
     })
@@ -175,7 +184,7 @@ const DOMController = (function ()
             let textEl = IDElement.querySelector(".project-text");
             if (!textEl)
                 throw new Error(`Could not find class="project-text"`);
-            textEl.contentEditable = true;
+            textEl.contentEditable = CONTENTEDITABLE;
             textEl.focus();
         }
         else if (event.target.closest("#addNewProject"))
@@ -199,13 +208,15 @@ const DOMController = (function ()
             if (!IDElement)
                 throw new Error(`No active project`);
 
-            projectController.update(localStorage, IDElement.id, editor.innerText);
+            // edited div with contentEditable adds a newline even if its content is empty
+            let editorText = removeBR(editor.innerText);
+            projectController.update(localStorage, IDElement.id, editorText);
 
             const projectObj = projectController.get(localStorage, IDElement.id);
             if (!projectObj)
                 throw new Error(`No stored item for this key: ${ IDElement.id }`);
-            projectController.createTodoList(localStorage, projectObj);
-            openProject(projectObj);
+            projectController.updateTodoList(localStorage, projectObj);
+            DOMCreator.updateTodoList(localStorage, projectObj.id);
         }
         else if (event.target.closest("button.project"))
         {

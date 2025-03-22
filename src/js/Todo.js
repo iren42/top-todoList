@@ -4,9 +4,9 @@ export const TODO_TYPE = "TODO";
 
 export const TODO_PREFIX = "- [ ] ";
 
-const TODO_SEPARATOR = "#";
+export const TODO_SEPARATOR = "#";
 
-export function Todo(projectID, lineNumber, title = "", dueDate = new Date())
+function Todo(projectID, lineNumber, title = "", dueDate = new Date())
 {
     this.type = TODO_TYPE;
     this.description = "";

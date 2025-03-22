@@ -2,10 +2,11 @@ import *  as Storage from "./storage.js";
 import { TODO_TYPE } from "./Todo.js";
 import { PROJECT_TYPE } from "./Project.js"
 
-export const CHECKBOX_SEPARATOR = "box:";
+const CHECKBOX_SEPARATOR = "box:";
 const DESCRIPTION_SEPARATOR = "des:";
 const PRIORITY_SEPARATOR = "pri:";
 
+// in charge of reading and displaying
 export const DOMCreator = (function ()
 {
     function updateSidebar(database)
@@ -134,8 +135,6 @@ export const DOMCreator = (function ()
                 throw new Error(`No stored item for this key: ${ key }`);
             if (stored.type === TODO_TYPE && stored.projectID === projectID)
             {
-                console.log(`key: ${ key }`);
-                console.log(stored);
                 const li = todo(stored);
                 ul.append(li);
             }
