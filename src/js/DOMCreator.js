@@ -1,5 +1,5 @@
 import *  as Storage from "./storage.js";
-import { TODO_TYPE } from "./Todo.js";
+import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.js";
 import { PROJECT_TYPE } from "./Project.js"
 
 const CHECKBOX_SEPARATOR = "box:";
@@ -83,12 +83,12 @@ export const DOMCreator = (function ()
             <fieldset>
                 <legend>Priority level:</legend>
                 <div class="priority">
-                    <input type="radio" id="1${ PRIORITY_SEPARATOR }${ obj.id }" name="priority" value="low" />
-                    <label for="1${ PRIORITY_SEPARATOR }${ obj.id }">Low</label>
-                    <input type="radio" id="2${ PRIORITY_SEPARATOR }${ obj.id }" name="priority" value="medium" />
-                    <label for="2${ PRIORITY_SEPARATOR }${ obj.id }">Medium</label>
-                    <input type="radio" id="3${ PRIORITY_SEPARATOR }${ obj.id }" name="priority" value="high" />
-                    <label for="3${ PRIORITY_SEPARATOR }${ obj.id }">High</label>
+                    <input type="radio" id="${ PRIORITY_VAL1 }${ PRIORITY_SEPARATOR }${ obj.id }" name="priority" value="${ PRIORITY_VAL1 }" />
+                    <label for="${ PRIORITY_VAL1 }${ PRIORITY_SEPARATOR }${ obj.id }">Low</label>
+                    <input type="radio" id="${ PRIORITY_VAL2 }${ PRIORITY_SEPARATOR }${ obj.id }" name="priority" value="${ PRIORITY_VAL2 }" />
+                    <label for="${ PRIORITY_VAL2 }${ PRIORITY_SEPARATOR }${ obj.id }">Medium</label>
+                    <input type="radio" id="${ PRIORITY_VAL3 }${ PRIORITY_SEPARATOR }${ obj.id }" name="priority" value="${ PRIORITY_VAL3 }" />
+                    <label for="${ PRIORITY_VAL3 }${ PRIORITY_SEPARATOR }${ obj.id }">High</label>
                 </div>
             </fieldset>
             <div class="wrapper">
@@ -118,12 +118,18 @@ export const DOMCreator = (function ()
         return (li);
     }
 
+    function isTodoFromThisProject(todo, projectID)
+    {
+        return (todo.type === TODO_TYPE && todo.projectID === projectID)
+    }
+
     function updateTodoList(database, projectID)
     {
         const preview = document.querySelector(".preview");
         preview.innerHTML = "";
         const ul = document.createElement("ul");
         ul.classList.add("todoList");
+        let prioriry;
 
         for (let i = 0; i < database.length; i++)
         {
@@ -131,13 +137,16 @@ export const DOMCreator = (function ()
             const stored = Storage.getItem(database, key);
             if (!stored)
                 return;
-            if (stored.type === TODO_TYPE && stored.projectID === projectID)
+            if (isTodoFromThisProject(stored, projectID))
             {
                 const li = todo(stored);
                 ul.append(li);
+                prioriry = stored.priority + PRIORITY_SEPARATOR + stored.id;
             }
         }
         preview.append(ul);
+        const radioEl = document.querySelector(`#${ CSS.escape(prioriry) }`);
+        radioEl.checked = true;
     }
 
     return ({

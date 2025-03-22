@@ -7,6 +7,10 @@ export const TODO_PREFIX = "- [ ] ";
 
 export const TODO_SEPARATOR = "#";
 
+export const PRIORITY_VAL1 = "low";
+export const PRIORITY_VAL2 = "medium";
+export const PRIORITY_VAL3 = "high";
+
 function Todo(projectID, lineNumber, title = "", dueDate = new Date())
 {
     this.type = TODO_TYPE;
@@ -15,7 +19,7 @@ function Todo(projectID, lineNumber, title = "", dueDate = new Date())
     this.title = title;
     this.id = todoController.getKey(lineNumber, projectID);
     this.isChecked = false;
-    this.priority = 0;
+    this.priority = PRIORITY_VAL1;
     this.projectID = projectID;
 }
 
