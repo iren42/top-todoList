@@ -3,6 +3,7 @@ import "./css/style.css";
 
 import { projectController } from "./js/Project.js"
 import { DOMCreator } from "./js/DOMCreator.js";
+import * as ERROR from "./js/error_constants.js";
 
 if (process.env.NODE_ENV !== 'production')
 {
@@ -99,10 +100,10 @@ const DOMController = (function ()
     {
         let IDElement = findParentElByClass(eventTarget, "project");
         if (!IDElement)
-            throw new Error(`Could not find <button class="project">`);
+            throw new Error(ERROR.CLASS("project"));
         let textEl = IDElement.querySelector(".project-text");
         if (!textEl)
-            throw new Error(`Could not find class="project-text"`);
+            throw new Error(ERROR.CLASS("project-text"));
 
         projectController.rename(localStorage, IDElement.id, textEl.innerText);
         eventTarget.contentEditable = false;
@@ -133,13 +134,14 @@ const DOMController = (function ()
             if (!(event.target instanceof HTMLInputElement))
                 return;
             if (!event.target.id)
-                throw new Error(`No id for this target: ${ event.target }`);
-
+                throw new Error(ERROR.ID(event.target));
             let IDElement = findParentElByClass(event.target, "todo");
             if (!IDElement)
-                throw new Error(`Could not find element with class="todo">`);
-            let todoKey = IDElement.id;
-            projectController.updateTodo(localStorage, todoKey, event.target.checked);
+                throw new Error(ERROR.CLASS("todo"));
+            if (!IDElement.id)
+                throw new Error(ERROR.ID(IDElement));
+
+            projectController.updateTodo(localStorage, IDElement.id, event.target.checked);
             console.log("change state of checkbox to " + event.target.checked);
         }
     })
@@ -150,12 +152,13 @@ const DOMController = (function ()
         {
             let IDElement = findParentElByClass(event.target, "todo");
             if (!IDElement)
-                throw new Error(`Could not find element with class="todo">`);
+                throw new Error(ERROR.CLASS("todo"));
             if (!IDElement.id)
-                throw new Error(`key`);
+                throw new Error(ERROR.ID(IDElement));
             const projectID = IDElement.dataset.projectid;
             if (!projectID)
-                throw new Error(`no project ID`);
+                throw new Error(`No dataset projectid`);
+
             projectController.remove(localStorage, IDElement.id);
             DOMCreator.updateTodoList(localStorage, projectID);
         }
@@ -163,14 +166,17 @@ const DOMController = (function ()
         {
             let IDElement = findParentElByClass(event.target, "todo");
             if (!IDElement)
-                throw new Error(`Could not find element with class="todo">`);
+                throw new Error(ERROR.CLASS("todo"));
+
             IDElement.classList.toggle('collapse');
         }
         else if (event.target.closest(".delete-project"))
         {
             let IDElement = findParentElByClass(event.target, "project");
             if (!IDElement)
-                throw new Error(`Could not find <button class="project">`);
+                throw new Error(ERROR.CLASS("project"));
+            if (!IDElement.id)
+                throw new Error(ERROR.ID(IDElement));
 
             projectController.remove(localStorage, IDElement.id);
             clearAll();
@@ -180,10 +186,11 @@ const DOMController = (function ()
         {
             let IDElement = findParentElByClass(event.target, "project");
             if (!IDElement)
-                throw new Error(`Could not find <button class="project">`);
+                throw new Error(ERROR.CLASS("project"));
             let textEl = IDElement.querySelector(".project-text");
             if (!textEl)
-                throw new Error(`Could not find class="project-text"`);
+                throw new Error(ERROR.CLASS("project-text"));
+
             textEl.contentEditable = CONTENTEDITABLE;
             textEl.focus();
         }
@@ -206,7 +213,9 @@ const DOMController = (function ()
             console.log("saving");
             const IDElement = document.querySelector(".project.active");
             if (!IDElement)
-                throw new Error(`No active project`);
+                throw new Error(ERROR.CLASS("project active"));
+            if (!IDElement.id)
+                throw new Error(ERROR.ID(IDElement.id));
 
             // edited div with contentEditable adds a newline even if its content is empty
             let editorText = removeBR(editor.innerText);
@@ -214,7 +223,7 @@ const DOMController = (function ()
 
             const projectObj = projectController.get(localStorage, IDElement.id);
             if (!projectObj)
-                throw new Error(`No stored item for this key: ${ IDElement.id }`);
+                throw new Error(ERROR.KEY(IDElement.id));
             projectController.updateTodoList(localStorage, projectObj);
             DOMCreator.updateTodoList(localStorage, projectObj.id);
         }
@@ -222,13 +231,13 @@ const DOMController = (function ()
         {
             let IDElement = findParentElByClass(event.target, "project");
             if (!IDElement)
-                throw new Error(`Could not find <button class="project">`);
+                throw new Error(ERROR.CLASS("project"));
+            if (!IDElement.id)
+                throw new Error(ERROR.ID(IDElement.id));
 
-            // query database
             const projectObj = projectController.get(localStorage, IDElement.id);
             if (!projectObj)
-                throw new Error(`No stored item for this key: ${ IDElement.id }`);
-
+                throw new Error(ERROR.KEY(IDElement.id));
             openProject(projectObj);
         }
         else;

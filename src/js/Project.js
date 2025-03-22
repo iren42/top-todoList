@@ -1,7 +1,9 @@
 import { TODO_PREFIX, todoController, TODO_SEPARATOR } from "./Todo.js";
 import *  as Storage from "./storage.js";
+import * as ERROR from "./error_constants.js"
 
 export const PROJECT_TYPE = "PROJECT";
+
 function Project(name = "New project", creationDate = new Date())
 {
     this.id = uid();
@@ -28,13 +30,14 @@ function isTodo(str)
 
 export const projectController = (function ()
 {
-    function removeTodoSurplus(database, projectObj, limit){
+    function removeTodoSurplus(database, projectObj, limit)
+    {
         for (let i = 0; i < database.length; i++)
         {
             const key = database.key(i);
             const stored = Storage.getItem(database, key);
             if (!stored)
-                throw new Error(`No stored item for this key: ${ key }`);
+                throw new Error(ERROR.KEY(key));
             if (stored.type === PROJECT_TYPE)
                 continue;
             if (stored.projectID !== projectObj.id)
@@ -77,7 +80,7 @@ export const projectController = (function ()
     // 'delete' is a reserved word
     function remove(database, key)
     {
-        console.log(" remove " + key);
+        console.log("remove " + key);
         Storage.removeItem(database, key);
     }
 
@@ -85,9 +88,9 @@ export const projectController = (function ()
     {
         const projectObj = Storage.getItem(database, key);
         if (!projectObj)
-            return ;
+            return;
         if (projectObj.type !== PROJECT_TYPE)
-            return ;
+            return;
         projectObj.content = newContent;
         Storage.setItem(database, projectObj.id, projectObj);
     }
@@ -109,8 +112,9 @@ export const projectController = (function ()
     {
         const stored = Storage.getItem(database, key);
         if (!stored)
-            throw new Error(`No stored item for this key: ${ key }`);
-
+            throw new Error(ERROR.KEY(key));
+        if (stored.type !== PROJECT_TYPE)
+            return;
         stored.name = newName;
         Storage.setItem(database, stored.id, stored);
         console.log(`renamed project to ${ stored.name }`);

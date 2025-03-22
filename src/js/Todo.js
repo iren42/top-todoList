@@ -1,4 +1,5 @@
 import *  as Storage from "./storage.js";
+import * as ERROR from "./error_constants.js"
 
 export const TODO_TYPE = "TODO";
 
@@ -30,7 +31,7 @@ export const todoController = (function ()
     {
         const stored = Storage.getItem(database, key);
         if (!stored)
-            return;
+            throw new Error(ERROR.KEY(key));
         if (stored.type !== TODO_TYPE)
             return;
         stored.isChecked = isChecked;
