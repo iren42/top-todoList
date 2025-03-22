@@ -129,7 +129,7 @@ const DOMController = (function ()
 
     preview.addEventListener("change", event =>
     {
-        if (event.target.closest("input[type='checkbox'][name='todo']"))
+        if (event.target.closest("input[type='checkbox']"))
         {
             if (!(event.target instanceof HTMLInputElement))
                 return;
@@ -141,9 +141,32 @@ const DOMController = (function ()
             if (!IDElement.id)
                 throw new Error(ERROR.ID(IDElement));
 
-            projectController.updateTodo(localStorage, IDElement.id, event.target.checked);
+            const todoObj = projectController.get(localStorage, IDElement.id);
+            if (!todoObj)
+                throw new Error(ERROR.KEY(IDElement.id));
+
+            const buf = {
+                isChecked: "off"
+            };
+            if (event.target.checked)
+                buf.isChecked = "on";
+
+            projectController.updateTodo(localStorage, todoObj, buf);
             console.log("change state of checkbox to " + event.target.checked);
         }
+    })
+
+    preview.addEventListener("submit", event =>
+    {
+        event.preventDefault();
+        if (!event.target.id)
+            throw new Error(ERROR.ID(event.target));
+
+        const todoObj = projectController.get(localStorage, event.target.id);
+        if (!todoObj)
+            throw new Error(ERROR.KEY(event.target.id));
+        const formData = new FormData(event.target);
+        projectController.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
     })
 
     document.addEventListener("click", event =>

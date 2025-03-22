@@ -18,7 +18,6 @@ function Todo(projectID, lineNumber, title = "", dueDate = new Date())
     this.dueDate = dueDate;
     this.title = title;
     this.id = todoController.getKey(lineNumber, projectID);
-    this.isChecked = false;
     this.priority = PRIORITY_VAL1;
     this.projectID = projectID;
 }
@@ -31,15 +30,10 @@ export const todoController = (function ()
         Storage.setItem(database, todo.id, todo);
     }
 
-    function update(database, key, isChecked)
+    function update(database, target, source)
     {
-        const stored = Storage.getItem(database, key);
-        if (!stored)
-            throw new Error(ERROR.KEY(key));
-        if (stored.type !== TODO_TYPE)
-            return;
-        stored.isChecked = isChecked;
-        Storage.setItem(database, key, stored);
+        Object.assign(target, source);
+        Storage.setItem(database, target.id, target);
     }
 
     function getKey(lineNumber, projectID)

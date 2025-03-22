@@ -78,7 +78,7 @@ export const DOMCreator = (function ()
         form.dataset.projectid = obj.projectID;
         form.innerHTML = `
             <label for="${ DESCRIPTION_SEPARATOR }${ obj.id }">Description:</label>
-            <textarea id="${ DESCRIPTION_SEPARATOR }${ obj.id }" name="description" rows="5" class="description" value="${ obj.description }"></textarea>
+            <textarea id="${ DESCRIPTION_SEPARATOR }${ obj.id }" name="description" rows="5" class="description">${ obj.description }</textarea>
 
             <fieldset>
                 <legend>Priority level:</legend>
@@ -109,8 +109,9 @@ export const DOMCreator = (function ()
         const checkbox = document.createElement("input");
         checkbox.setAttribute("type", "checkbox");
         checkbox.id = `${ CHECKBOX_SEPARATOR }${ obj.id }`;
-        checkbox.name = "todo";
-        checkbox.checked = obj.isChecked;
+        checkbox.name = "isChecked";
+        if (obj.isChecked === "on")
+            checkbox.checked = obj.isChecked;
 
         li.append(form);
         form.prepend(wrapper);
@@ -129,7 +130,8 @@ export const DOMCreator = (function ()
         preview.innerHTML = "";
         const ul = document.createElement("ul");
         ul.classList.add("todoList");
-        let prioriry;
+        const IDarray = [];
+        let radioID;
 
         for (let i = 0; i < database.length; i++)
         {
@@ -141,12 +143,21 @@ export const DOMCreator = (function ()
             {
                 const li = todo(stored);
                 ul.append(li);
-                prioriry = stored.priority + PRIORITY_SEPARATOR + stored.id;
+                radioID = stored.priority + PRIORITY_SEPARATOR + stored.id;
+                IDarray.push(radioID);
             }
         }
         preview.append(ul);
-        const radioEl = document.querySelector(`#${ CSS.escape(prioriry) }`);
-        radioEl.checked = true;
+        checkTodoInput(IDarray);
+    }
+
+    function checkTodoInput(list)
+    {
+        for (let i = 0; i < list.length; i++)
+        {
+            const radioEl = document.querySelector(`#${ CSS.escape(list[i]) }`);
+            radioEl.checked = true;
+        }
     }
 
     return ({

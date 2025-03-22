@@ -103,9 +103,9 @@ export const projectController = (function ()
         return (projectObj);
     }
 
-    function updateTodo(database, key, isChecked)
+    function updateTodo(database, target, source)
     {
-        todoController.update(database, key, isChecked);
+        todoController.update(database, target, source);
     }
 
     function rename(database, key, newName)
