@@ -168,6 +168,7 @@ const DOMController = (function ()
         const formData = new FormData(event.target);
         console.log(Object.fromEntries(formData));
         projectController.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
+        DOMCreator.updateTodoList(localStorage, todoObj.projectID);
         console.log("save todo");
     })
 

@@ -1,7 +1,7 @@
 import *  as Storage from "./storage.js";
+import { formatRelativeToNow } from "./date.js";
 import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.js";
 import { PROJECT_TYPE } from "./Project.js"
-import { format } from "date-fns";
 
 const CHECKBOX_SEPARATOR = "box:";
 const DESCRIPTION_SEPARATOR = "des:";
@@ -115,12 +115,15 @@ export const DOMCreator = (function ()
             </div>
         `;
 
-        const wrapper = document.createElement("div");
-        wrapper.classList.add("min");
+        const min = document.createElement("div");
+        min.classList.add("min");
 
-        wrapper.innerHTML = `
+        let dateToNow = "";
+        if (obj.dueDate)
+            dateToNow = formatRelativeToNow(obj.dueDate);
+        min.innerHTML = `
             <label for="${ CHECKBOX_SEPARATOR }${ obj.id }">${ obj.title }</label>
-            <span class="dueDate">${ obj.dueDate } ${obj.dueTime}</span>
+            <span class="dueDate">${ dateToNow } ${obj.dueTime}</span>
             <button type="button" class="expand-todo"><i class="fi fi-tr-square-plus"></i>
             </button>
         `;
@@ -132,8 +135,8 @@ export const DOMCreator = (function ()
             checkbox.checked = obj.isChecked;
 
         li.append(form);
-        form.prepend(wrapper);
-        wrapper.prepend(checkbox);
+        form.prepend(min);
+        min.prepend(checkbox);
         return (li);
     }
 
@@ -174,6 +177,8 @@ export const DOMCreator = (function ()
         for (let i = 0; i < list.length; i++)
         {
             const radioEl = document.querySelector(`#${ CSS.escape(list[i]) }`);
+            if (!radioEl)
+                continue;
             radioEl.checked = true;
         }
     }
