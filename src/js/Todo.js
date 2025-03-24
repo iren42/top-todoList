@@ -26,7 +26,7 @@ function Todo(projectID, lineNumber, title = "", isChecked = "off")
 
 export const todoController = (function ()
 {
-    function create(database,{ projectID, lineNumber, title, isChecked})
+    function create(database, projectID, lineNumber, title, isChecked)
     {
         const todo = new Todo(projectID, lineNumber, title, isChecked);
         Storage.setItem(database, todo.id, todo);

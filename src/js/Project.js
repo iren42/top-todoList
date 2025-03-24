@@ -63,9 +63,7 @@ export const projectController = (function() {
 			if (todo) {
 				todoController.update(localStorage, todo, { title });
 			} else {
-				todoController.create(database, {
-					projectID: projectObject.id, i, title, isChecked: !checkboxValue,
-				});
+				todoController.create(database, projectObject.id, i, title, !checkboxValue);
 			}
 		}
 	}
