@@ -131,8 +131,7 @@ export const DOMCreator = (function ()
         checkbox.setAttribute("type", "checkbox");
         checkbox.id = `${ CHECKBOX_SEPARATOR }${ obj.id }`;
         checkbox.name = "isChecked";
-        if (obj.isChecked === "on")
-            checkbox.checked = obj.isChecked;
+        checkbox.autocomplete = "off";
 
         li.append(form);
         form.prepend(min);
@@ -153,6 +152,7 @@ export const DOMCreator = (function ()
         ul.classList.add("todoList");
         const IDarray = [];
         let radioID;
+        let checkID;
 
         for (let i = 0; i < database.length; i++)
         {
@@ -165,7 +165,11 @@ export const DOMCreator = (function ()
                 const li = todo(stored);
                 ul.append(li);
                 radioID = stored.priority + PRIORITY_SEPARATOR + stored.id;
+                checkID = CHECKBOX_SEPARATOR + stored.id ;
+
                 IDarray.push(radioID);
+                if (stored.isChecked === "on")
+                    IDarray.push(checkID);
             }
         }
         preview.append(ul);
@@ -176,10 +180,10 @@ export const DOMCreator = (function ()
     {
         for (let i = 0; i < list.length; i++)
         {
-            const radioEl = document.querySelector(`#${ CSS.escape(list[i]) }`);
-            if (!radioEl)
+            const inputEl = document.querySelector(`#${ CSS.escape(list[i]) }`);
+            if (!inputEl)
                 continue;
-            radioEl.checked = true;
+            inputEl.checked = true;
         }
     }
 

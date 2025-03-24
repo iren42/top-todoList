@@ -3,6 +3,7 @@ import *  as Storage from "./storage.js";
 export const TODO_TYPE = "TODO";
 
 export const TODO_PREFIX = "- [ ] ";
+export const TODO_PREFIX_DONE = "- [x] ";
 
 export const TODO_SEPARATOR = "#";
 
@@ -10,13 +11,14 @@ export const PRIORITY_VAL1 = "low";
 export const PRIORITY_VAL2 = "medium";
 export const PRIORITY_VAL3 = "high";
 
-function Todo(projectID, lineNumber, title = "")
+function Todo(projectID, lineNumber, title = "", isChecked = "off")
 {
     this.type = TODO_TYPE;
     this.description = "";
     this.dueDate = "";
     this.dueTime = "";
     this.title = title;
+	this.isChecked = isChecked;
     this.id = todoController.getKey(lineNumber, projectID);
     this.priority = PRIORITY_VAL1;
     this.projectID = projectID;
@@ -24,9 +26,9 @@ function Todo(projectID, lineNumber, title = "")
 
 export const todoController = (function ()
 {
-    function create(database, projectID, lineNumber, title)
+    function create(database,{ projectID, lineNumber, title, isChecked})
     {
-        const todo = new Todo(projectID, lineNumber, title);
+        const todo = new Todo(projectID, lineNumber, title, isChecked);
         Storage.setItem(database, todo.id, todo);
     }
 
