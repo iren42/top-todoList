@@ -52,7 +52,8 @@ export const projectController = (function() {
 		for (const [i, line] of lines.entries()) {
 			const title = line.slice(TODO_PREFIX.length);
 			const key = todoController.getKey(i, projectObject.id);
-			const checkboxValue = line.indexOf(TODO_PREFIX_DONE);
+			const hasX = (!line.indexOf(TODO_PREFIX_DONE));
+			console.log(hasX);
 			if (!isTodo(line)) {
 				Storage.removeItem(database, key);
 				continue;
@@ -62,9 +63,10 @@ export const projectController = (function() {
 			// Update todos that have different title
 			if (todo) {
 				todoController.update(localStorage, todo, { title });
-			} else {
-				todoController.create(database, projectObject.id, i, title, !checkboxValue);
-			}
+			} else if (hasX)
+				todoController.create(database, projectObject.id, i, title, "on");
+			else
+				todoController.create(database, projectObject.id, i, title);
 		}
 	}
 
