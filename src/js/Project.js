@@ -53,7 +53,14 @@ export const projectController = (function() {
 			const title = line.slice(TODO_PREFIX.length);
 			const key = todoController.getKey(i, projectObject.id);
 			const hasX = (!line.indexOf(TODO_PREFIX_DONE));
-			console.log(hasX);
+			let isChecked = "off";
+			if (hasX)
+				isChecked = "on";
+			const buf = {
+				title,
+				isChecked
+			};
+
 			if (!isTodo(line)) {
 				Storage.removeItem(database, key);
 				continue;
@@ -62,8 +69,9 @@ export const projectController = (function() {
 			const todo = Storage.getItem(database, key);
 			// Update todos that have different title
 			if (todo) {
-				todoController.update(localStorage, todo, { title });
-			} else if (hasX)
+				todoController.update(localStorage, todo, buf);
+			}
+			else if (hasX)
 				todoController.create(database, projectObject.id, i, title, "on");
 			else
 				todoController.create(database, projectObject.id, i, title);
