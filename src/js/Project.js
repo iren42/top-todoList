@@ -67,14 +67,11 @@ export const projectController = (function() {
 			}
 
 			const todo = Storage.getItem(database, key);
-			// Update todos that have different title
 			if (todo) {
 				todoController.update(localStorage, todo, buf);
 			}
-			else if (hasX)
-				todoController.create(database, projectObject.id, i, title, "on");
 			else
-				todoController.create(database, projectObject.id, i, title);
+				todoController.create(database, projectObject.id, i, buf);
 		}
 	}
 
