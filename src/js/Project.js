@@ -1,4 +1,4 @@
-import { TODO_PREFIX, TODO_PREFIX_DONE, todoController, TODO_SEPARATOR } from './Todo.js';
+import { TODO_PREFIX, TODO_TYPE, TODO_PREFIX_DONE, todoController, TODO_SEPARATOR } from './Todo.js';
 import * as Storage from './storage.js';
 import * as ERROR from './error_constants.js';
 
@@ -87,14 +87,25 @@ export const projectController = (function() {
 		Storage.removeItem(database, key);
 	}
 
-	function update(database, key, newContent) {
+	function updateContent(database, key, newContent = "", todoObj = null) {
 		const projectObject = Storage.getItem(database, key);
 		if (!projectObject)
 			throw new Error(ERROR.KEY(key));
 		if (projectObject.type !== PROJECT_TYPE)
 			return;
+		if (todoObj && todoObj.type === TODO_TYPE) {
+			const lines = projectObject.content.split("\n");
+			let newLine;
 
-		projectObject.content = newContent;
+			if (todoObj.isChecked === "on")
+				newLine = lines[todoObj.lineNumber].replace(TODO_PREFIX, TODO_PREFIX_DONE);
+			else
+				newLine = lines[todoObj.lineNumber].replace(TODO_PREFIX_DONE, TODO_PREFIX);
+			lines.splice(todoObj.lineNumber, 1, newLine);
+			projectObject.content = lines.join("\n");
+		}
+		else
+			projectObject.content = newContent;
 		Storage.setItem(database, projectObject.id, projectObject);
 	}
 
@@ -130,7 +141,7 @@ export const projectController = (function() {
 		updateTodoList,
 		updateTodo,
 		create,
-		update,
+		updateContent,
 		get,
 		remove,
 		clearAll,

@@ -1,7 +1,7 @@
 import *  as Storage from "./storage.js";
 import { formatRelativeToNow } from "./date.js";
-import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.js";
-import { PROJECT_TYPE } from "./Project.js"
+import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3, TODO_PREFIX, TODO_PREFIX_DONE } from "./Todo.js";
+import { PROJECT_TYPE, projectController } from "./Project.js"
 
 const CHECKBOX_SEPARATOR = "box:";
 const DESCRIPTION_SEPARATOR = "des:";
@@ -176,6 +176,14 @@ export const DOMCreator = (function ()
         checkTodoInput(IDarray);
     }
 
+	function updateEditor(database, todoObj)
+	{
+		const editor = document.querySelector(".editor");
+		editor.innerHTML = "";
+		const updatedProj = projectController.get(database, todoObj.projectID);
+		editor.append(updatedProj.content);
+	}
+
     function checkTodoInput(list)
     {
         for (let i = 0; i < list.length; i++)
@@ -189,6 +197,7 @@ export const DOMCreator = (function ()
 
     return ({
         updateTodoList,
+		updateEditor,
         updateSidebar
     })
 })();

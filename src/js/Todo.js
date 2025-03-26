@@ -18,6 +18,7 @@ function Todo(projectID, lineNumber, title = "", isChecked = "off")
     this.dueDate = "";
     this.dueTime = "";
     this.title = title;
+	this.lineNumber = lineNumber;
 	this.isChecked = isChecked;
     this.id = todoController.getKey(lineNumber, projectID);
     this.priority = PRIORITY_VAL1;

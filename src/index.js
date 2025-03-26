@@ -130,6 +130,11 @@ const DOMController = (function() {
 				buf.isChecked = "on";
 
 			projectController.updateTodo(localStorage, todoObj, buf);
+
+			const updatedTodo = projectController.get(localStorage, todoObj.id);
+			projectController.updateContent(localStorage, updatedTodo.projectID, "" , updatedTodo);
+			DOMCreator.updateEditor(localStorage, updatedTodo);
+
 			console.log("change state of checkbox to " + event.target.checked);
 		}
 	})
@@ -145,7 +150,10 @@ const DOMController = (function() {
 		const formData = new FormData(event.target);
 		console.log(Object.fromEntries(formData));
 		projectController.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
-		DOMCreator.updateTodoList(localStorage, todoObj.projectID);
+		const updatedTodo = projectController.get(localStorage, todoObj.id);
+		projectController.updateContent(localStorage, updatedTodo.projectID, "" , updatedTodo);
+		DOMCreator.updateTodoList(localStorage, updatedTodo.projectID);
+		DOMCreator.updateEditor(localStorage, updatedTodo);
 		console.log("save todo");
 	})
 
@@ -214,7 +222,7 @@ const DOMController = (function() {
 
 			// edited div with contentEditable adds a newline even if its content is empty
 			let editorText = removeBR(editor.innerText);
-			projectController.update(localStorage, IDElement.id, editorText);
+			projectController.updateContent(localStorage, IDElement.id, editorText);
 
 			const projectObj = projectController.get(localStorage, IDElement.id);
 			if (!projectObj)
