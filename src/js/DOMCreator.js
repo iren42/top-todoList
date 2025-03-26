@@ -176,12 +176,12 @@ export const DOMCreator = (function ()
         checkTodoInput(IDarray);
     }
 
-	function updateEditor(database, todoObj)
+	function updateEditor(database, projectID)
 	{
 		const editor = document.querySelector(".editor");
 		editor.innerHTML = "";
-		const updatedProj = projectController.get(database, todoObj.projectID);
-		editor.append(updatedProj.content);
+		const projectObj = projectController.get(database, projectID);
+		editor.append(projectObj.content);
 	}
 
     function checkTodoInput(list)

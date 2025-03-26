@@ -132,8 +132,10 @@ const DOMController = (function() {
 			projectController.updateTodo(localStorage, todoObj, buf);
 
 			const updatedTodo = projectController.get(localStorage, todoObj.id);
-			projectController.updateContent(localStorage, updatedTodo.projectID, "" , updatedTodo);
-			DOMCreator.updateEditor(localStorage, updatedTodo);
+
+			const projectObj = projectController.get(localStorage, todoObj.projectID);
+			projectController.update(localStorage,  projectObj, updatedTodo);
+			DOMCreator.updateEditor(localStorage, projectObj.id);
 
 			console.log("change state of checkbox to " + event.target.checked);
 		}
@@ -150,10 +152,13 @@ const DOMController = (function() {
 		const formData = new FormData(event.target);
 		console.log(Object.fromEntries(formData));
 		projectController.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
+
 		const updatedTodo = projectController.get(localStorage, todoObj.id);
-		projectController.updateContent(localStorage, updatedTodo.projectID, "" , updatedTodo);
+
+		const projectObj = projectController.get(localStorage, updatedTodo.projectID);
+		projectController.update(localStorage,  projectObj, updatedTodo);
 		DOMCreator.updateTodoList(localStorage, updatedTodo.projectID);
-		DOMCreator.updateEditor(localStorage, updatedTodo);
+		DOMCreator.updateEditor(localStorage, projectObj.id);
 		console.log("save todo");
 	})
 
@@ -222,11 +227,11 @@ const DOMController = (function() {
 
 			// edited div with contentEditable adds a newline even if its content is empty
 			let editorText = removeBR(editor.innerText);
-			projectController.updateContent(localStorage, IDElement.id, editorText);
 
 			const projectObj = projectController.get(localStorage, IDElement.id);
 			if (!projectObj)
 				throw new Error(ERROR.KEY(IDElement.id));
+			projectController.update(localStorage, projectObj, { content: editorText });
 			projectController.updateTodoList(localStorage, projectObj);
 			DOMCreator.updateTodoList(localStorage, projectObj.id);
 		}

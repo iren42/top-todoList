@@ -87,26 +87,24 @@ export const projectController = (function() {
 		Storage.removeItem(database, key);
 	}
 
-	function updateContent(database, key, newContent = "", todoObj = null) {
-		const projectObject = Storage.getItem(database, key);
-		if (!projectObject)
-			throw new Error(ERROR.KEY(key));
-		if (projectObject.type !== PROJECT_TYPE)
+	// function updateContent(database, key, newContent = "", todoObj = null) {
+	function update(database, target, source) {
+		if (target.type !== PROJECT_TYPE)
 			return;
-		if (todoObj && todoObj.type === TODO_TYPE) {
-			const lines = projectObject.content.split("\n");
+		if (source.type === TODO_TYPE) {
+			const lines = target.content.split("\n");
 			let newLine;
 
-			if (todoObj.isChecked === "on")
-				newLine = lines[todoObj.lineNumber].replace(TODO_PREFIX, TODO_PREFIX_DONE);
+			if (source.isChecked === "on")
+				newLine = lines[source.lineNumber].replace(TODO_PREFIX, TODO_PREFIX_DONE);
 			else
-				newLine = lines[todoObj.lineNumber].replace(TODO_PREFIX_DONE, TODO_PREFIX);
-			lines.splice(todoObj.lineNumber, 1, newLine);
-			projectObject.content = lines.join("\n");
+				newLine = lines[source.lineNumber].replace(TODO_PREFIX_DONE, TODO_PREFIX);
+			lines.splice(source.lineNumber, 1, newLine);
+			target.content = lines.join("\n");
 		}
 		else
-			projectObject.content = newContent;
-		Storage.setItem(database, projectObject.id, projectObject);
+			target.content = source.content;
+		Storage.setItem(database, target.id, target);
 	}
 
 	function get(database, key) {
@@ -141,7 +139,7 @@ export const projectController = (function() {
 		updateTodoList,
 		updateTodo,
 		create,
-		updateContent,
+		update,
 		get,
 		remove,
 		clearAll,
