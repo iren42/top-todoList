@@ -1,8 +1,10 @@
 import "./css/normalize.css";
 import "./css/style.css";
 
-import { projectController } from "./js/Project.js"
+import { isBefore, isAfter, isToday, addDays, subDays } from "date-fns";
+import { project } from "./js/Project.js"
 import { DOMCreator } from "./js/DOMCreator.js";
+import { TODO_TYPE } from "./js/Todo.js";
 import * as ERROR from "./js/error_constants.js";
 
 if (process.env.NODE_ENV !== 'production') {
@@ -25,7 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
 	}
 }
 
-const DOMController = (function() {
+{
 	const editor = document.querySelector(".editor");
 	const preview = document.querySelector(".todoView");
 	const CONTENTEDITABLE = "plaintext-only";
@@ -56,6 +58,45 @@ const DOMController = (function() {
 		return (element);
 	}
 
+	function isNextSevenDays(date) {
+		return (isAfter(date, subDays(new Date(), 1)) &&
+			isBefore(date, addDays(new Date(), 6)));
+	}
+
+	function createTodoFNList(database, fnDateInterval) {
+		const todoArr = [];
+
+		for (let i = 0; i < database.length; i++) {
+			const key = database.key(i);
+			const stored = project.get(database, key);
+			if (!stored)
+				continue;
+			if (stored.type !== TODO_TYPE)
+				continue;
+			if (fnDateInterval(stored.dueDate))
+				todoArr.push(stored);
+		}
+		return (todoArr);
+	}
+
+	function createArrayOfSortedTodos(database, projectID) {
+		const todoArray = [];
+		for (let i = 0; i < database.length; i++) {
+			const key = database.key(i);
+			const stored = project.get(database, key);
+			if (!stored)
+				continue;
+			if (stored.type !== TODO_TYPE)
+				continue;
+			if (stored.projectID !== projectID)
+				continue;
+			todoArray.push(stored);
+		}
+		todoArray.sort((a, b) => a.lineNumber - b.lineNumber)
+		return (todoArray);
+	}
+
+
 	function openProject(projectObj) {
 		clearAll();
 		const IDElement = document.querySelector(`#${CSS.escape(projectObj.id)}`);
@@ -67,7 +108,7 @@ const DOMController = (function() {
 		editor.contentEditable = CONTENTEDITABLE;
 		DOMCreator.updateEditor(localStorage, projectObj.id);
 
-		const todoArr = DOMCreator.createArrayOfSortedTodos(localStorage, projectObj.id);
+		const todoArr = createArrayOfSortedTodos(localStorage, projectObj.id);
 		DOMCreator.updateTodoList(todoArr);
 	}
 
@@ -85,7 +126,7 @@ const DOMController = (function() {
 		if (!textEl)
 			throw new Error(ERROR.CLASS("project-text"));
 
-		projectController.rename(localStorage, IDElement.id, textEl.innerText);
+		project.rename(localStorage, IDElement.id, textEl.innerText);
 		eventTarget.contentEditable = false;
 	}
 
@@ -115,7 +156,7 @@ const DOMController = (function() {
 			if (!IDElement.id)
 				throw new Error(ERROR.ID(IDElement));
 
-			const todoObj = projectController.get(localStorage, IDElement.id);
+			const todoObj = project.get(localStorage, IDElement.id);
 			if (!todoObj)
 				throw new Error(ERROR.KEY(IDElement.id));
 
@@ -125,12 +166,13 @@ const DOMController = (function() {
 			if (event.target.checked)
 				buf.isChecked = "on";
 
-			projectController.updateTodo(localStorage, todoObj, buf);
+			project.updateTodo(localStorage, todoObj, buf);
 
-			const updatedTodo = projectController.get(localStorage, todoObj.id);
+			// update Project obj with Todo obj
+			const updatedTodo = project.get(localStorage, todoObj.id);
+			const projectObj = project.get(localStorage, todoObj.projectID);
+			project.update(localStorage, projectObj, updatedTodo);
 
-			const projectObj = projectController.get(localStorage, todoObj.projectID);
-			projectController.update(localStorage,  projectObj, updatedTodo);
 			DOMCreator.updateEditor(localStorage, projectObj.id);
 
 			console.log("change state of checkbox to " + event.target.checked);
@@ -142,56 +184,47 @@ const DOMController = (function() {
 		if (!event.target.id)
 			throw new Error(ERROR.ID(event.target));
 
-		const todoObj = projectController.get(localStorage, event.target.id);
+		const todoObj = project.get(localStorage, event.target.id);
 		if (!todoObj)
 			throw new Error(ERROR.KEY(event.target.id));
+
+		// update Todo obj
 		const formData = new FormData(event.target);
-		console.log(Object.fromEntries(formData));
-		projectController.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
+		project.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
 
-		const updatedTodo = projectController.get(localStorage, todoObj.id);
+		// update Project obj with Todo obj
+		const updatedTodo = project.get(localStorage, todoObj.id);
+		const projectObj = project.get(localStorage, updatedTodo.projectID);
+		project.update(localStorage, projectObj, updatedTodo);
 
-		const projectObj = projectController.get(localStorage, updatedTodo.projectID);
-		projectController.update(localStorage,  projectObj, updatedTodo);
-		const todoArr = DOMCreator.createArrayOfSortedTodos(localStorage, updatedTodo.projectID);
+		// update DOM
+		const todoArr = createArrayOfSortedTodos(localStorage, updatedTodo.projectID);
 		DOMCreator.updateTodoList(todoArr);
 		DOMCreator.updateEditor(localStorage, projectObj.id);
 		console.log("save todo");
 	})
 
+	function openOverview(element, fnDateInterval) {
+		let IDElement = findParentElByClass(element, "overview");
+		if (!IDElement)
+			throw new Error(ERROR.CLASS("overview"));
+		clearAll();
+		removeActiveClasses();
+		IDElement.classList.add("active");
+
+		const todoArr = createTodoFNList(localStorage, fnDateInterval);
+		DOMCreator.updateTodoList(todoArr);
+	}
+
 	document.addEventListener("click", event => {
 		if (event.target.closest("#todo-all")) {
-			let IDElement = findParentElByClass(event.target, "overview");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("overview"));
-			clearAll();
-			removeActiveClasses();
-			IDElement.classList.add("active");
-
-			const todoArr = DOMCreator.createTodoFNList(localStorage, () => 1);
-			DOMCreator.updateTodoList(todoArr);
+			openOverview(event.target, () => 1);
 		}
-		if (event.target.closest("#todo-seven")) {
-			let IDElement = findParentElByClass(event.target, "overview");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("overview"));
-			clearAll();
-			removeActiveClasses();
-			IDElement.classList.add("active");
-
-			const todoArr = DOMCreator.createTodoFNList(localStorage, DOMCreator.isNextSevenDays);
-			DOMCreator.updateTodoList(todoArr);
+		else if (event.target.closest("#todo-seven")) {
+			openOverview(event.target, isNextSevenDays);
 		}
 		else if (event.target.closest("#todo-today")) {
-			let IDElement = findParentElByClass(event.target, "overview");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("overview"));
-			clearAll();
-			removeActiveClasses();
-			IDElement.classList.add("active");
-
-			const todayArr = DOMCreator.createTodoFNList(localStorage, DOMCreator.isToday);
-			DOMCreator.updateTodoList(todayArr);
+			openOverview(event.target, isToday);
 		}
 		else if (event.target.closest(".delete-todo")) {
 			let IDElement = findParentElByClass(event.target, "todo");
@@ -203,8 +236,8 @@ const DOMController = (function() {
 			if (!projectID)
 				throw new Error(`No dataset projectid`);
 
-			projectController.remove(localStorage, IDElement.id);
-			const todoArr = DOMCreator.createArrayOfSortedTodos(localStorage, projectID);
+			project.remove(localStorage, IDElement.id);
+			const todoArr = createArrayOfSortedTodos(localStorage, projectID);
 			DOMCreator.updateTodoList(todoArr);
 		}
 		else if (event.target.closest(".expand-todo")) {
@@ -221,7 +254,7 @@ const DOMController = (function() {
 			if (!IDElement.id)
 				throw new Error(ERROR.ID(IDElement));
 
-			projectController.remove(localStorage, IDElement.id);
+			project.remove(localStorage, IDElement.id);
 			clearAll();
 			DOMCreator.updateSidebar(localStorage);
 		}
@@ -238,14 +271,14 @@ const DOMController = (function() {
 		}
 		else if (event.target.closest("#addNewProject")) {
 			console.log("add a new project");
-			const newProject = projectController.create(localStorage);
+			const newProject = project.create(localStorage);
 			DOMCreator.updateSidebar(localStorage);
 			openProject(newProject);
 		}
 		else if (event.target.closest("#clearBtn")) {
 			console.log("clear data");
 			clearAll();
-			projectController.clearAll(localStorage);
+			project.clearAll(localStorage);
 			DOMCreator.updateSidebar(localStorage);
 		}
 		else if (event.target.closest("#saveBtn")) {
@@ -254,17 +287,17 @@ const DOMController = (function() {
 			if (!IDElement)
 				throw new Error(ERROR.CLASS("project active"));
 			if (!IDElement.id)
-				throw new Error(ERROR.ID(IDElement.id));
+				throw new Error(ERROR.ID(IDElement));
 
 			// edited div with contentEditable adds a newline even if its content is empty
 			let editorText = removeBR(editor.innerText);
 
-			const projectObj = projectController.get(localStorage, IDElement.id);
+			const projectObj = project.get(localStorage, IDElement.id);
 			if (!projectObj)
 				throw new Error(ERROR.KEY(IDElement.id));
-			projectController.update(localStorage, projectObj, { content: editorText });
-			projectController.updateTodoList(localStorage, projectObj);
-			const todoArr = DOMCreator.createArrayOfSortedTodos(localStorage, projectObj.id);
+			project.update(localStorage, projectObj, { content: editorText });
+			project.updateTodoList(localStorage, projectObj);
+			const todoArr = createArrayOfSortedTodos(localStorage, projectObj.id);
 			DOMCreator.updateTodoList(todoArr);
 		}
 		else if (event.target.closest("button.project")) {
@@ -272,9 +305,9 @@ const DOMController = (function() {
 			if (!IDElement)
 				throw new Error(ERROR.CLASS("project"));
 			if (!IDElement.id)
-				throw new Error(ERROR.ID(IDElement.id));
+				throw new Error(ERROR.ID(IDElement));
 
-			const projectObj = projectController.get(localStorage, IDElement.id);
+			const projectObj = project.get(localStorage, IDElement.id);
 			if (!projectObj)
 				throw new Error(ERROR.KEY(IDElement.id));
 			openProject(projectObj);
@@ -283,9 +316,6 @@ const DOMController = (function() {
 	});
 
 	DOMCreator.updateSidebar(localStorage);
-	const todayArr = DOMCreator.createTodoFNList(localStorage, DOMCreator.isToday);
+	const todayArr = createTodoFNList(localStorage, isToday);
 	DOMCreator.updateTodoList(todayArr);
-
-	return ({
-	})
-})();
+}

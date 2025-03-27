@@ -1,8 +1,7 @@
 import *  as Storage from "./storage.js";
 import { formatRelativeToNow } from "./date.js";
-import { isBefore, isAfter, isToday, addDays, subDays } from "date-fns";
-import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3, TODO_PREFIX, TODO_PREFIX_DONE } from "./Todo.js";
-import { PROJECT_TYPE, projectController } from "./Project.js"
+import { PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.js";
+import { PROJECT_TYPE } from "./Project.js"
 
 const CHECKBOX_SEPARATOR = "box:";
 const DESCRIPTION_SEPARATOR = "des:";
@@ -11,32 +10,9 @@ const DUEDATE_SEPARATOR = "date:";
 const DUETIME_SEPARATOR = "time:";
 const TITLE_SEPARATOR = "titl:";
 
-// in charge of reading and displaying
+// in charge of updating the DOM
 export const DOMCreator = (function ()
 {
-	function isNextSevenDays(date) {
-		return (isAfter(date, subDays(new Date(), 1)) &&
-			isBefore(date, addDays(new Date(), 6)));
-	}
-
-	function createTodoFNList(database, fnDateInterval)
-	{
-		const todoArr = [];
-
-		for (let i = 0; i < database.length; i++)
-		{
-            const key = database.key(i);
-            const stored = Storage.getItem(database, key);
-            if (!stored)
-                continue;
-            if (stored.type !== TODO_TYPE)
-                continue;
-			if (fnDateInterval(stored.dueDate))
-				todoArr.push(stored);
-		}
-		return (todoArr);
-	}
-
     function updateSidebar(database)
     {
         const projectListDiv = document.querySelector(".projectList");
@@ -165,28 +141,6 @@ export const DOMCreator = (function ()
         return (li);
     }
 
-    function isTodoFromThisProject(todo, projectID)
-    {
-        return (todo.type === TODO_TYPE && todo.projectID === projectID)
-    }
-
-	function createArrayOfSortedTodos(database, projectID)
-	{
-		const todoArray = [];
-        for (let i = 0; i < database.length; i++)
-        {
-            const key = database.key(i);
-            const stored = Storage.getItem(database, key);
-            if (!stored)
-                continue;
-            if (!isTodoFromThisProject(stored, projectID))
-				continue;
-			todoArray.push(stored);
-        }
-		todoArray.sort((a, b) => a.lineNumber - b.lineNumber)
-		return (todoArray);
-	}
-
     function updateTodoList(todoArray)
     {
         const preview = document.querySelector(".todoView");
@@ -195,7 +149,6 @@ export const DOMCreator = (function ()
         ul.classList.add("todoList");
 
         const IDArray = [];
-		// const todoArray = createArrayOfSortedTodos(database, projectID);
         let radioID;
         let checkID;
 
@@ -217,7 +170,9 @@ export const DOMCreator = (function ()
 	{
 		const editor = document.querySelector(".editor");
 		editor.innerHTML = "";
-		const projectObj = projectController.get(database, projectID);
+		const projectObj = Storage.getItem(database, projectID);
+		if (!projectObj)
+			return;
 		editor.append(projectObj.content);
 	}
 
@@ -236,9 +191,5 @@ export const DOMCreator = (function ()
         updateTodoList,
 		updateEditor,
         updateSidebar,
-		createArrayOfSortedTodos,
-		createTodoFNList,
-		isNextSevenDays,
-		isToday
     })
 })();

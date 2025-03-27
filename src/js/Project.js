@@ -25,7 +25,7 @@ function isTodo(string_) {
 	return (true);
 }
 
-export const projectController = (function() {
+export const project = (function() {
 	function removeTodoSurplus(database, projectObject, limit) {
 		for (let i = 0; i < database.length; i++) {
 			const key = database.key(i);
@@ -87,7 +87,7 @@ export const projectController = (function() {
 		Storage.removeItem(database, key);
 	}
 
-	function editEditor(target, source)
+	function updateContentWithTodo(target, source)
 	{
 		const lines = target.content.split("\n");
 		const regex = new RegExp(`(?<=^.{${TODO_PREFIX.length}}).*`);
@@ -106,7 +106,7 @@ export const projectController = (function() {
 		if (target.type !== PROJECT_TYPE)
 			return;
 		if (source.type === TODO_TYPE)
-			editEditor(target, source);
+			updateContentWithTodo(target, source);
 		else
 			target.content = source.content;
 		Storage.setItem(database, target.id, target);
