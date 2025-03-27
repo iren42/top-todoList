@@ -87,7 +87,6 @@ export const projectController = (function() {
 		Storage.removeItem(database, key);
 	}
 
-	// function updateContent(database, key, newContent = "", todoObj = null) {
 	function update(database, target, source) {
 		if (target.type !== PROJECT_TYPE)
 			return;

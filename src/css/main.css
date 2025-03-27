@@ -18,7 +18,7 @@
 .main {
 
 	& .editor,
-	.preview {
+	.todoView {
 		flex-grow: 1;
 		width: 100%;
 		padding: var(--spacing-xs);

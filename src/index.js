@@ -27,7 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const DOMController = (function() {
 	const editor = document.querySelector(".editor");
-	const preview = document.querySelector(".preview");
+	const preview = document.querySelector(".todoView");
 	const CONTENTEDITABLE = "plaintext-only";
 
 	function clearAll() {
@@ -163,7 +163,10 @@ const DOMController = (function() {
 	})
 
 	document.addEventListener("click", event => {
-		if (event.target.closest(".delete-todo")) {
+		if (event.target.closest("#todo-today")) {
+			console.log("here");
+		}
+		else if (event.target.closest(".delete-todo")) {
 			let IDElement = findParentElByClass(event.target, "todo");
 			if (!IDElement)
 				throw new Error(ERROR.CLASS("todo"));

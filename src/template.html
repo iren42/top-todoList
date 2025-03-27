@@ -24,21 +24,21 @@
 
                 <ul class="overviewList">
                     <li>
-                        <button type="button" class="overview active">
+                        <button type="button" class="overview active" id="todo-today">
                             <i class="fi fi-rr-calendar-day overview-icon"></i>
                             <span class="overview-text">Today</span>
                             <span class="tooltip">Today</span>
                         </button>
                     </li>
                     <li>
-                        <button type="button" class="overview">
+                        <button type="button" class="overview" id="todo-seven">
                             <i class="fi fi-rr-calendar-week overview-icon"></i>
                             <span class="overview-text">Next 7 days</span>
                             <span class="tooltip">Next 7 days</span>
                         </button>
                     </li>
                     <li>
-                        <button type="button" class="overview">
+                        <button type="button" class="overview" id="todo-all">
                             <i class="fi fi-rr-calendar-plus overview-icon"></i>
                             <span class="overview-text">See all</span>
                             <span class="tooltip">See all</span>
@@ -64,7 +64,7 @@
                 <div class="editor" contenteditable="false"  data-text="Write here..." data-default="Open or create a project"></div>
             </div>
             <div class="right">
-                <div class="preview"></div>
+                <div class="todoView"></div>
             </div>
 
         </div>

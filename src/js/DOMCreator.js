@@ -2,6 +2,7 @@ import *  as Storage from "./storage.js";
 import { formatRelativeToNow } from "./date.js";
 import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3, TODO_PREFIX, TODO_PREFIX_DONE } from "./Todo.js";
 import { PROJECT_TYPE, projectController } from "./Project.js"
+import { compareAsc } from "date-fns";
 
 const CHECKBOX_SEPARATOR = "box:";
 const DESCRIPTION_SEPARATOR = "des:";
@@ -144,36 +145,47 @@ export const DOMCreator = (function ()
         return (todo.type === TODO_TYPE && todo.projectID === projectID)
     }
 
-    function updateTodoList(database, projectID)
-    {
-        const preview = document.querySelector(".preview");
-        preview.innerHTML = "";
-        const ul = document.createElement("ul");
-        ul.classList.add("todoList");
-        const IDarray = [];
-        let radioID;
-        let checkID;
-
+	function createArrayOfSortedTodos(database, projectID)
+	{
+		const todoArray = [];
         for (let i = 0; i < database.length; i++)
         {
             const key = database.key(i);
             const stored = Storage.getItem(database, key);
             if (!stored)
-                return;
-            if (isTodoFromThisProject(stored, projectID))
-            {
-                const li = todo(stored);
-                ul.append(li);
-                radioID = stored.priority + PRIORITY_SEPARATOR + stored.id;
-                checkID = CHECKBOX_SEPARATOR + stored.id ;
-
-                IDarray.push(radioID);
-                if (stored.isChecked === "on")
-                    IDarray.push(checkID);
-            }
+                continue;
+            if (!isTodoFromThisProject(stored, projectID))
+				continue;
+			todoArray.push(stored);
         }
+		todoArray.sort((a, b) => a.lineNumber - b.lineNumber)
+		return (todoArray);
+	}
+
+    function updateTodoList(database, projectID)
+    {
+        const preview = document.querySelector(".todoView");
+        preview.innerHTML = "";
+        const ul = document.createElement("ul");
+        ul.classList.add("todoList");
+
+        const IDArray = [];
+		const todoArray = createArrayOfSortedTodos(database, projectID);
+        let radioID;
+        let checkID;
+
+		for (let i = 0; i < todoArray.length; i++)
+		{
+			ul.append(todo(todoArray[i]));
+			radioID = todoArray[i].priority + PRIORITY_SEPARATOR + todoArray[i].id;
+			checkID = CHECKBOX_SEPARATOR + todoArray[i].id ;
+
+			IDArray.push(radioID);
+			if (todoArray[i].isChecked === "on")
+				IDArray.push(checkID);
+		}
         preview.append(ul);
-        checkTodoInput(IDarray);
+        checkTodoInput(IDArray);
     }
 
 	function updateEditor(database, projectID)
