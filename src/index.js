@@ -28,13 +28,12 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 {
-	const preview = document.querySelector(".todoView");
+	const todoListDiv = document.querySelector(".todoList");
 
 	function clearAll() {
 		const leftDiv = document.querySelector(".left");
-		if (leftDiv)
-			leftDiv.innerHTML = "";
-		preview.innerHTML = "";
+		leftDiv.innerHTML = "";
+		todoListDiv.innerHTML = "";
 	}
 
 	function removeActiveClasses() {
@@ -150,7 +149,7 @@ if (process.env.NODE_ENV !== 'production') {
 		}
 	})
 
-	preview.addEventListener("change", event => {
+	todoListDiv.addEventListener("change", event => {
 		try {
 			if (event.target.closest("input[type='checkbox']")) {
 				if (!(event.target instanceof HTMLInputElement))
@@ -189,7 +188,7 @@ if (process.env.NODE_ENV !== 'production') {
 		}
 	})
 
-	preview.addEventListener("submit", event => {
+	todoListDiv.addEventListener("submit", event => {
 		try {
 			event.preventDefault();
 			if (!event.target.id)

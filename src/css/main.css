@@ -1,11 +1,20 @@
 @import './constants.css';
 
+.editor[contentEditable]:not([contentEditable=false]):empty:not(:focus):before{
+	content: attr(data-text);
+	color: var(--dark-grey);
+}
+
 .main {
 	display: flex;
 }
 
 .main .left {
 	border-right: 1px solid var(--border-color);
+}
+
+.main .left:empty {
+	display: none;
 }
 
 .main .left,
@@ -15,20 +24,26 @@
 	flex-direction: column;
 }
 
-.main .left:empty {
-	display: none;
-}
-
 .main {
 
-	& .editor,
-	.todoView {
+	& .editor {
 		flex-grow: 1;
 		width: 100%;
 		padding: var(--spacing-xs);
 		white-space: pre-wrap;
 		display: block;
 	}
+
+	& .todoList {
+		height: 100%;
+		width: 100%;
+	}
+
+	& .left:empty + .right .todoList:empty:before {
+		content: attr(data-default);
+		color: var(--dark-grey);
+	}
+
 }
 
 #saveBtn,
@@ -40,6 +55,7 @@
 	color: var(--light);
 	font-weight: 900;
 	border: none;
+	white-space: nowrap;
 }
 
 .todo {

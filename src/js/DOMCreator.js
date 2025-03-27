@@ -144,11 +144,8 @@ export const DOMCreator = (function ()
 
     function updateTodoList(todoArray)
     {
-        const preview = document.querySelector(".todoView");
-        preview.innerHTML = "";
-        const ul = document.createElement("ul");
-        ul.classList.add("todoList");
-
+        const ul = document.querySelector(".todoList");
+        ul.innerHTML = "";
         const IDArray = [];
         let radioID;
         let checkID;
@@ -163,7 +160,6 @@ export const DOMCreator = (function ()
 			if (todoArray[i].isChecked === "on")
 				IDArray.push(checkID);
 		}
-        preview.append(ul);
         checkTodoInput(IDArray);
     }
 
@@ -176,7 +172,7 @@ export const DOMCreator = (function ()
 		leftDiv.innerHTML = "";
 		leftDiv.innerHTML = `
 			<button type="button " id="saveBtn">Save</button>
-			<div class="editor" contenteditable="${CONTENTEDITABLE}"  data-text="Write here..." data-default="Open or create a project">${projectObj.content}</div>
+			<div class="editor" contenteditable="${CONTENTEDITABLE}"  data-text="Write here..." >${projectObj.content}</div>
 		`;
 	}
 

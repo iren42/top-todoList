@@ -10,16 +10,6 @@
 	padding: 0;
 }
 
-.editor[contentEditable]:not([contentEditable=false]):empty:not(:focus):before{
-	content: attr(data-text);
-	color: var(--dark-grey);
-}
-
-.editor[contentEditable=false]:before {
-	content: attr(data-default);
-	color: var(--dark-grey);
-}
-
 html,
 body {
 	min-height: 100%;
@@ -183,10 +173,6 @@ footer {
 	opacity: 0;
 	display: none;
 	box-shadow: var(--box-shadow);
-}
-
-#clearBtn {
-	white-space: nowrap;
 }
 
 .overview.active,
