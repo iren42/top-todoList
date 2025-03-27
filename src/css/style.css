@@ -185,6 +185,7 @@ footer {
 	box-shadow: var(--box-shadow);
 }
 
+.overview.active,
 .project.active {
 	background-color: var(--grey);
 }

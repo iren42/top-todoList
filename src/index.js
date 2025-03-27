@@ -37,17 +37,12 @@ const DOMController = (function() {
 	}
 
 	function removeActiveClasses() {
-		const list = document.querySelectorAll(".project.active");
+		const list = document.querySelectorAll(".active");
 		if (!list)
 			return;
 		for (let i = 0; i < list.length; i++) {
 			list[i].classList.remove("active");
 		}
-	}
-
-	function view(where, what) {
-		where.innerHTML = "";
-		where.append(what);
 	}
 
 	function findParentElByClass(element, className) {
@@ -70,9 +65,10 @@ const DOMController = (function() {
 		IDElement.classList.add("active");
 
 		editor.contentEditable = CONTENTEDITABLE;
-		view(editor, projectObj.content);
+		DOMCreator.updateEditor(localStorage, projectObj.id);
 
-		DOMCreator.updateTodoList(localStorage, projectObj.id);
+		const todoArr = DOMCreator.createArrayOfSortedTodos(localStorage, projectObj.id);
+		DOMCreator.updateTodoList(todoArr);
 	}
 
 	function removeBR(str) {
@@ -157,14 +153,45 @@ const DOMController = (function() {
 
 		const projectObj = projectController.get(localStorage, updatedTodo.projectID);
 		projectController.update(localStorage,  projectObj, updatedTodo);
-		DOMCreator.updateTodoList(localStorage, updatedTodo.projectID);
+		const todoArr = DOMCreator.createArrayOfSortedTodos(localStorage, updatedTodo.projectID);
+		DOMCreator.updateTodoList(todoArr);
 		DOMCreator.updateEditor(localStorage, projectObj.id);
 		console.log("save todo");
 	})
 
 	document.addEventListener("click", event => {
-		if (event.target.closest("#todo-today")) {
-			console.log("here");
+		if (event.target.closest("#todo-all")) {
+			let IDElement = findParentElByClass(event.target, "overview");
+			if (!IDElement)
+				throw new Error(ERROR.CLASS("overview"));
+			clearAll();
+			removeActiveClasses();
+			IDElement.classList.add("active");
+
+			const todoArr = DOMCreator.createTodoFNList(localStorage, () => 1);
+			DOMCreator.updateTodoList(todoArr);
+		}
+		if (event.target.closest("#todo-seven")) {
+			let IDElement = findParentElByClass(event.target, "overview");
+			if (!IDElement)
+				throw new Error(ERROR.CLASS("overview"));
+			clearAll();
+			removeActiveClasses();
+			IDElement.classList.add("active");
+
+			const todoArr = DOMCreator.createTodoFNList(localStorage, DOMCreator.isNextSevenDays);
+			DOMCreator.updateTodoList(todoArr);
+		}
+		else if (event.target.closest("#todo-today")) {
+			let IDElement = findParentElByClass(event.target, "overview");
+			if (!IDElement)
+				throw new Error(ERROR.CLASS("overview"));
+			clearAll();
+			removeActiveClasses();
+			IDElement.classList.add("active");
+
+			const todayArr = DOMCreator.createTodoFNList(localStorage, DOMCreator.isToday);
+			DOMCreator.updateTodoList(todayArr);
 		}
 		else if (event.target.closest(".delete-todo")) {
 			let IDElement = findParentElByClass(event.target, "todo");
@@ -177,7 +204,8 @@ const DOMController = (function() {
 				throw new Error(`No dataset projectid`);
 
 			projectController.remove(localStorage, IDElement.id);
-			DOMCreator.updateTodoList(localStorage, projectID);
+			const todoArr = DOMCreator.createArrayOfSortedTodos(localStorage, projectID);
+			DOMCreator.updateTodoList(todoArr);
 		}
 		else if (event.target.closest(".expand-todo")) {
 			let IDElement = findParentElByClass(event.target, "todo");
@@ -236,7 +264,8 @@ const DOMController = (function() {
 				throw new Error(ERROR.KEY(IDElement.id));
 			projectController.update(localStorage, projectObj, { content: editorText });
 			projectController.updateTodoList(localStorage, projectObj);
-			DOMCreator.updateTodoList(localStorage, projectObj.id);
+			const todoArr = DOMCreator.createArrayOfSortedTodos(localStorage, projectObj.id);
+			DOMCreator.updateTodoList(todoArr);
 		}
 		else if (event.target.closest("button.project")) {
 			let IDElement = findParentElByClass(event.target, "project");
@@ -254,6 +283,8 @@ const DOMController = (function() {
 	});
 
 	DOMCreator.updateSidebar(localStorage);
+	const todayArr = DOMCreator.createTodoFNList(localStorage, DOMCreator.isToday);
+	DOMCreator.updateTodoList(todayArr);
 
 	return ({
 	})
