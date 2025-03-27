@@ -13,6 +13,7 @@ const TITLE_SEPARATOR = "titl:";
 // in charge of updating the DOM
 export const DOMCreator = (function ()
 {
+	const CONTENTEDITABLE = "plaintext-only";
     function updateSidebar(database)
     {
         const projectListDiv = document.querySelector(".projectList");
@@ -168,12 +169,15 @@ export const DOMCreator = (function ()
 
 	function updateEditor(database, projectID)
 	{
-		const editor = document.querySelector(".editor");
-		editor.innerHTML = "";
 		const projectObj = Storage.getItem(database, projectID);
 		if (!projectObj)
 			return;
-		editor.append(projectObj.content);
+		const leftDiv = document.querySelector(".left");
+		leftDiv.innerHTML = "";
+		leftDiv.innerHTML = `
+			<button type="button " id="saveBtn">Save</button>
+			<div class="editor" contenteditable="${CONTENTEDITABLE}"  data-text="Write here..." data-default="Open or create a project">${projectObj.content}</div>
+		`;
 	}
 
     function checkTodoInput(list)

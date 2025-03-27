@@ -185,6 +185,10 @@ footer {
 	box-shadow: var(--box-shadow);
 }
 
+#clearBtn {
+	white-space: nowrap;
+}
+
 .overview.active,
 .project.active {
 	background-color: var(--grey);
@@ -215,6 +219,7 @@ footer {
 	padding-left: var(--spacing-xs);
 }
 
+.sidebar.collapse #clearBtn,
 .sidebar.collapse .project-header-wrapper,
 .sidebar.collapse .overview-header-wrapper {
 	opacity: 0;

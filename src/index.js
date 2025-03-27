@@ -28,13 +28,12 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 {
-	const editor = document.querySelector(".editor");
 	const preview = document.querySelector(".todoView");
-	const CONTENTEDITABLE = "plaintext-only";
 
 	function clearAll() {
-		editor.contentEditable = false;
-		editor.innerHTML = "";
+		const leftDiv = document.querySelector(".left");
+		if (leftDiv)
+			leftDiv.innerHTML = "";
 		preview.innerHTML = "";
 	}
 
@@ -105,7 +104,6 @@ if (process.env.NODE_ENV !== 'production') {
 		removeActiveClasses();
 		IDElement.classList.add("active");
 
-		editor.contentEditable = CONTENTEDITABLE;
 		DOMCreator.updateEditor(localStorage, projectObj.id);
 
 		const todoArr = createArrayOfSortedTodos(localStorage, projectObj.id);
@@ -132,76 +130,92 @@ if (process.env.NODE_ENV !== 'production') {
 
 	const projectListDiv = document.querySelector("ul.projectList");
 	projectListDiv.addEventListener("focusout", event => {
-		if (event.target.closest(".project-text")) {
-			renameProject(event.target);
+		try {
+			if (event.target.closest(".project-text")) {
+				renameProject(event.target);
+			}
+		} catch (error) {
+			console.error(error);
 		}
 	})
 
 	projectListDiv.addEventListener("keydown", event => {
-		if (event.key === "Enter" && event.target.closest(".project-text")) {
-			event.preventDefault();
-			renameProject(event.target);
+		try {
+			if (event.key === "Enter" && event.target.closest(".project-text")) {
+				event.preventDefault();
+				renameProject(event.target);
+			}
+		} catch (error) {
+			console.error(error);
 		}
 	})
 
 	preview.addEventListener("change", event => {
-		if (event.target.closest("input[type='checkbox']")) {
-			if (!(event.target instanceof HTMLInputElement))
-				return;
-			if (!event.target.id)
-				throw new Error(ERROR.ID(event.target));
-			let IDElement = findParentElByClass(event.target, "todo");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("todo"));
-			if (!IDElement.id)
-				throw new Error(ERROR.ID(IDElement));
+		try {
+			if (event.target.closest("input[type='checkbox']")) {
+				if (!(event.target instanceof HTMLInputElement))
+					return;
+				if (!event.target.id)
+					throw new Error(ERROR.ID(event.target));
+				let IDElement = findParentElByClass(event.target, "todo");
+				if (!IDElement)
+					throw new Error(ERROR.CLASS("todo"));
+				if (!IDElement.id)
+					throw new Error(ERROR.ID(IDElement));
 
-			const todoObj = project.get(localStorage, IDElement.id);
-			if (!todoObj)
-				throw new Error(ERROR.KEY(IDElement.id));
+				const todoObj = project.get(localStorage, IDElement.id);
+				if (!todoObj)
+					throw new Error(ERROR.KEY(IDElement.id));
 
-			const buf = {
-				isChecked: "off"
-			};
-			if (event.target.checked)
-				buf.isChecked = "on";
+				const buf = {
+					isChecked: "off"
+				};
+				if (event.target.checked)
+					buf.isChecked = "on";
 
-			project.updateTodo(localStorage, todoObj, buf);
+				project.updateTodo(localStorage, todoObj, buf);
 
-			// update Project obj with Todo obj
-			const updatedTodo = project.get(localStorage, todoObj.id);
-			const projectObj = project.get(localStorage, todoObj.projectID);
-			project.update(localStorage, projectObj, updatedTodo);
+				// update Project obj with Todo obj
+				const updatedTodo = project.get(localStorage, todoObj.id);
+				const projectObj = project.get(localStorage, todoObj.projectID);
+				project.update(localStorage, projectObj, updatedTodo);
 
-			DOMCreator.updateEditor(localStorage, projectObj.id);
+				DOMCreator.updateEditor(localStorage, projectObj.id);
 
-			console.log("change state of checkbox to " + event.target.checked);
+				console.log("change state of checkbox to " + event.target.checked);
+			}
+		} catch (error) {
+			console.error(error);
 		}
 	})
 
 	preview.addEventListener("submit", event => {
-		event.preventDefault();
-		if (!event.target.id)
-			throw new Error(ERROR.ID(event.target));
+		try {
+			event.preventDefault();
+			if (!event.target.id)
+				throw new Error(ERROR.ID(event.target));
 
-		const todoObj = project.get(localStorage, event.target.id);
-		if (!todoObj)
-			throw new Error(ERROR.KEY(event.target.id));
+			const todoObj = project.get(localStorage, event.target.id);
+			if (!todoObj)
+				throw new Error(ERROR.KEY(event.target.id));
 
-		// update Todo obj
-		const formData = new FormData(event.target);
-		project.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
+			// update Todo obj
+			const formData = new FormData(event.target);
+			project.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
 
-		// update Project obj with Todo obj
-		const updatedTodo = project.get(localStorage, todoObj.id);
-		const projectObj = project.get(localStorage, updatedTodo.projectID);
-		project.update(localStorage, projectObj, updatedTodo);
+			// update Project obj with Todo obj
+			const updatedTodo = project.get(localStorage, todoObj.id);
+			const projectObj = project.get(localStorage, updatedTodo.projectID);
+			project.update(localStorage, projectObj, updatedTodo);
 
-		// update DOM
-		const todoArr = createArrayOfSortedTodos(localStorage, updatedTodo.projectID);
-		DOMCreator.updateTodoList(todoArr);
-		DOMCreator.updateEditor(localStorage, projectObj.id);
-		console.log("save todo");
+			// update DOM
+			const todoArr = createArrayOfSortedTodos(localStorage, updatedTodo.projectID);
+			DOMCreator.updateTodoList(todoArr);
+			DOMCreator.updateEditor(localStorage, projectObj.id);
+			console.log("save todo");
+		} catch (error) {
+			console.error(error);
+		}
 	})
 
 	function openOverview(element, fnDateInterval) {
@@ -217,102 +231,109 @@ if (process.env.NODE_ENV !== 'production') {
 	}
 
 	document.addEventListener("click", event => {
-		if (event.target.closest("#todo-all")) {
-			openOverview(event.target, () => 1);
-		}
-		else if (event.target.closest("#todo-seven")) {
-			openOverview(event.target, isNextSevenDays);
-		}
-		else if (event.target.closest("#todo-today")) {
-			openOverview(event.target, isToday);
-		}
-		else if (event.target.closest(".delete-todo")) {
-			let IDElement = findParentElByClass(event.target, "todo");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("todo"));
-			if (!IDElement.id)
-				throw new Error(ERROR.ID(IDElement));
-			const projectID = IDElement.dataset.projectid;
-			if (!projectID)
-				throw new Error(`No dataset projectid`);
+		try {
+			if (event.target.closest("#todo-all")) {
+				openOverview(event.target, () => 1);
+			}
+			else if (event.target.closest("#todo-seven")) {
+				openOverview(event.target, isNextSevenDays);
+			}
+			else if (event.target.closest("#todo-today")) {
+				openOverview(event.target, isToday);
+			}
+			else if (event.target.closest(".delete-todo")) {
+				let IDElement = findParentElByClass(event.target, "todo");
+				if (!IDElement)
+					throw new Error(ERROR.CLASS("todo"));
+				if (!IDElement.id)
+					throw new Error(ERROR.ID(IDElement));
+				const projectID = IDElement.dataset.projectid;
+				if (!projectID)
+					throw new Error(`No dataset projectid`);
 
-			project.remove(localStorage, IDElement.id);
-			const todoArr = createArrayOfSortedTodos(localStorage, projectID);
-			DOMCreator.updateTodoList(todoArr);
-		}
-		else if (event.target.closest(".expand-todo")) {
-			let IDElement = findParentElByClass(event.target, "todo");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("todo"));
+				project.remove(localStorage, IDElement.id);
+				const todoArr = createArrayOfSortedTodos(localStorage, projectID);
+				DOMCreator.updateTodoList(todoArr);
+			}
+			else if (event.target.closest(".expand-todo")) {
+				let IDElement = findParentElByClass(event.target, "todo");
+				if (!IDElement)
+					throw new Error(ERROR.CLASS("todo"));
 
-			IDElement.classList.toggle('collapse');
-		}
-		else if (event.target.closest(".delete-project")) {
-			let IDElement = findParentElByClass(event.target, "project");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("project"));
-			if (!IDElement.id)
-				throw new Error(ERROR.ID(IDElement));
+				IDElement.classList.toggle('collapse');
+			}
+			else if (event.target.closest(".delete-project")) {
+				let IDElement = findParentElByClass(event.target, "project");
+				if (!IDElement)
+					throw new Error(ERROR.CLASS("project"));
+				if (!IDElement.id)
+					throw new Error(ERROR.ID(IDElement));
 
-			project.remove(localStorage, IDElement.id);
-			clearAll();
-			DOMCreator.updateSidebar(localStorage);
-		}
-		else if (event.target.closest(".rename-project")) {
-			let IDElement = findParentElByClass(event.target, "project");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("project"));
-			let textEl = IDElement.querySelector(".project-text");
-			if (!textEl)
-				throw new Error(ERROR.CLASS("project-text"));
+				project.remove(localStorage, IDElement.id);
+				clearAll();
+				DOMCreator.updateSidebar(localStorage);
+			}
+			else if (event.target.closest(".rename-project")) {
+				let IDElement = findParentElByClass(event.target, "project");
+				if (!IDElement)
+					throw new Error(ERROR.CLASS("project"));
+				let textEl = IDElement.querySelector(".project-text");
+				if (!textEl)
+					throw new Error(ERROR.CLASS("project-text"));
 
-			textEl.contentEditable = CONTENTEDITABLE;
-			textEl.focus();
-		}
-		else if (event.target.closest("#addNewProject")) {
-			console.log("add a new project");
-			const newProject = project.create(localStorage);
-			DOMCreator.updateSidebar(localStorage);
-			openProject(newProject);
-		}
-		else if (event.target.closest("#clearBtn")) {
-			console.log("clear data");
-			clearAll();
-			project.clearAll(localStorage);
-			DOMCreator.updateSidebar(localStorage);
-		}
-		else if (event.target.closest("#saveBtn")) {
-			console.log("saving");
-			const IDElement = document.querySelector(".project.active");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("project active"));
-			if (!IDElement.id)
-				throw new Error(ERROR.ID(IDElement));
+				textEl.contentEditable = CONTENTEDITABLE;
+				textEl.focus();
+			}
+			else if (event.target.closest("#addNewProject")) {
+				console.log("add a new project");
+				const newProject = project.create(localStorage);
+				DOMCreator.updateSidebar(localStorage);
+				openProject(newProject);
+			}
+			else if (event.target.closest("#clearBtn")) {
+				console.log("clear data");
+				clearAll();
+				project.clearAll(localStorage);
+				DOMCreator.updateSidebar(localStorage);
+			}
+			else if (event.target.closest("#saveBtn")) {
+				console.log("saving");
+				const IDElement = document.querySelector(".project.active");
+				if (!IDElement)
+					throw new Error(ERROR.CLASS("project active"));
+				if (!IDElement.id)
+					throw new Error(ERROR.ID(IDElement));
 
-			// edited div with contentEditable adds a newline even if its content is empty
-			let editorText = removeBR(editor.innerText);
+				// edited div with contentEditable adds a newline even if its content is empty
+				const editor = document.querySelector(".editor");
+				if (!editor)
+					throw new Error("No editor");
+				let editorText = removeBR(editor.innerText);
 
-			const projectObj = project.get(localStorage, IDElement.id);
-			if (!projectObj)
-				throw new Error(ERROR.KEY(IDElement.id));
-			project.update(localStorage, projectObj, { content: editorText });
-			project.updateTodoList(localStorage, projectObj);
-			const todoArr = createArrayOfSortedTodos(localStorage, projectObj.id);
-			DOMCreator.updateTodoList(todoArr);
-		}
-		else if (event.target.closest("button.project")) {
-			let IDElement = findParentElByClass(event.target, "project");
-			if (!IDElement)
-				throw new Error(ERROR.CLASS("project"));
-			if (!IDElement.id)
-				throw new Error(ERROR.ID(IDElement));
+				const projectObj = project.get(localStorage, IDElement.id);
+				if (!projectObj)
+					throw new Error(ERROR.KEY(IDElement.id));
+				project.update(localStorage, projectObj, { content: editorText });
+				project.updateTodoList(localStorage, projectObj);
+				const todoArr = createArrayOfSortedTodos(localStorage, projectObj.id);
+				DOMCreator.updateTodoList(todoArr);
+			}
+			else if (event.target.closest("button.project")) {
+				let IDElement = findParentElByClass(event.target, "project");
+				if (!IDElement)
+					throw new Error(ERROR.CLASS("project"));
+				if (!IDElement.id)
+					throw new Error(ERROR.ID(IDElement));
 
-			const projectObj = project.get(localStorage, IDElement.id);
-			if (!projectObj)
-				throw new Error(ERROR.KEY(IDElement.id));
-			openProject(projectObj);
+				const projectObj = project.get(localStorage, IDElement.id);
+				if (!projectObj)
+					throw new Error(ERROR.KEY(IDElement.id));
+				openProject(projectObj);
+			}
+			else;
+		} catch (error) {
+			console.error(error);
 		}
-		else;
 	});
 
 	DOMCreator.updateSidebar(localStorage);
