@@ -87,20 +87,26 @@ export const projectController = (function() {
 		Storage.removeItem(database, key);
 	}
 
+	function editEditor(target, source)
+	{
+		const lines = target.content.split("\n");
+		const regex = new RegExp(`(?<=^.{${TODO_PREFIX.length}}).*`);
+		let newLine;
+
+		if (source.isChecked === "on")
+			newLine = lines[source.lineNumber].replace(TODO_PREFIX, TODO_PREFIX_DONE);
+		else
+			newLine = lines[source.lineNumber].replace(TODO_PREFIX_DONE, TODO_PREFIX);
+		newLine = newLine.replace(regex, source.title);
+		lines.splice(source.lineNumber, 1, newLine);
+		target.content = lines.join("\n");
+	}
+
 	function update(database, target, source) {
 		if (target.type !== PROJECT_TYPE)
 			return;
-		if (source.type === TODO_TYPE) {
-			const lines = target.content.split("\n");
-			let newLine;
-
-			if (source.isChecked === "on")
-				newLine = lines[source.lineNumber].replace(TODO_PREFIX, TODO_PREFIX_DONE);
-			else
-				newLine = lines[source.lineNumber].replace(TODO_PREFIX_DONE, TODO_PREFIX);
-			lines.splice(source.lineNumber, 1, newLine);
-			target.content = lines.join("\n");
-		}
+		if (source.type === TODO_TYPE)
+			editEditor(target, source);
 		else
 			target.content = source.content;
 		Storage.setItem(database, target.id, target);

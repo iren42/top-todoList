@@ -2,13 +2,13 @@ import *  as Storage from "./storage.js";
 import { formatRelativeToNow } from "./date.js";
 import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3, TODO_PREFIX, TODO_PREFIX_DONE } from "./Todo.js";
 import { PROJECT_TYPE, projectController } from "./Project.js"
-import { compareAsc } from "date-fns";
 
 const CHECKBOX_SEPARATOR = "box:";
 const DESCRIPTION_SEPARATOR = "des:";
 const PRIORITY_SEPARATOR = "pri:";
 const DUEDATE_SEPARATOR = "date:";
 const DUETIME_SEPARATOR = "time:";
+const TITLE_SEPARATOR = "titl:";
 
 // in charge of reading and displaying
 export const DOMCreator = (function ()
@@ -81,6 +81,12 @@ export const DOMCreator = (function ()
         form.id = obj.id;
         form.dataset.projectid = obj.projectID;
         form.innerHTML = `
+		<label for="${TITLE_SEPARATOR}${obj.id}">Title:</label>
+		<input
+		  type="text"
+		  id="${TITLE_SEPARATOR}${obj.id}"
+		  name="title" value="${obj.title}"/>
+
             <label for="${ DESCRIPTION_SEPARATOR }${ obj.id }">Description:</label>
             <textarea id="${ DESCRIPTION_SEPARATOR }${ obj.id }" name="description" rows="5" class="description">${ obj.description }</textarea>
 
@@ -91,8 +97,8 @@ export const DOMCreator = (function ()
             value="${obj.dueDate}"
             name="dueDate"
             min="2020-01-01" />
-            <label for="${DUETIME_SEPARATOR}${obj.id}">Due time:</label>
 
+            <label for="${DUETIME_SEPARATOR}${obj.id}">Due time:</label>
             <input
             type="time"
             id="${DUETIME_SEPARATOR}${obj.id}"
@@ -123,20 +129,15 @@ export const DOMCreator = (function ()
         if (obj.dueDate)
             dateToNow = formatRelativeToNow(obj.dueDate);
         min.innerHTML = `
+			<input type="checkbox" id="${ CHECKBOX_SEPARATOR }${ obj.id }" name="isChecked" autocomplete="off">
             <label for="${ CHECKBOX_SEPARATOR }${ obj.id }">${ obj.title }</label>
             <span class="dueDate">${ dateToNow } ${obj.dueTime}</span>
             <button type="button" class="expand-todo"><i class="fi fi-tr-square-plus"></i>
             </button>
         `;
-        const checkbox = document.createElement("input");
-        checkbox.setAttribute("type", "checkbox");
-        checkbox.id = `${ CHECKBOX_SEPARATOR }${ obj.id }`;
-        checkbox.name = "isChecked";
-        checkbox.autocomplete = "off";
 
         li.append(form);
         form.prepend(min);
-        min.prepend(checkbox);
         return (li);
     }
 
