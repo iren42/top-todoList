@@ -196,7 +196,10 @@ if (process.env.NODE_ENV !== 'production') {
 			// update DOM
 			const todoArr = createArrayOfSortedTodos(todoObj.projectID);
 			DOMCreator.updateTodoList(todoArr);
-			DOMCreator.updateEditor(todoObj.projectID);
+
+			const active = document.querySelector(".active");
+			if (active.classList.contains("project"))
+				DOMCreator.updateEditor(todoObj.projectID);
 			console.log("save todo");
 		} catch (error) {
 			console.error(error);
