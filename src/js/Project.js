@@ -108,7 +108,22 @@ export const project = (function() {
 
 	// 'delete' is a reserved word
 	function remove(key) {
-		console.log('remove ' + key);
+		const projectObject = Storage.getItem(key);
+		if (!projectObject)
+			throw new Error(ERROR.KEY(key));
+		for (let i = 0; i < Storage.getLength(); i++)
+		{
+			const todoKey = Storage.key(i);
+			const stored = Storage.getItem(todoKey);
+			if (!stored)
+				throw new Error(ERROR.KEY(todoKey));
+			if (stored.type === PROJECT_TYPE)
+				continue;
+			if (stored.projectID !== projectObject.id)
+				continue;
+
+			Storage.removeItem(todoKey);
+		}
 		Storage.removeItem(key);
 	}
 
