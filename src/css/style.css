@@ -74,9 +74,11 @@ footer {
 .sidebar {
 	width: var(--sidebar-width);
 	height: 100%;
-	padding: var(--spacing-sm);
+	padding: var(--spacing-xs);
 	background-color: var(--background);
 	border-right: 1px solid var(--border-color);
+	display: flex;
+	flex-direction: column;
 }
 
 .logo-name-wrapper,
@@ -189,6 +191,7 @@ footer {
 
 .sidebar.collapse {
 	width: var(--sidebar-width-collapsed);
+	align-items: center;
 }
 
 .sidebar.collapse .tooltip {
