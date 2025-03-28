@@ -20,22 +20,31 @@ export function storageAvailable(type)
     }
 }
 
-export function getItem(list, key)
+export function getItem(key)
 {
-    return (JSON.parse(list.getItem(key)));
+    return (JSON.parse(localStorage.getItem(key)));
 }
 
-export function clear(list)
+export function clear()
 {
-    list.clear();
+    localStorage.clear();
 }
 
-export function removeItem(list, key)
+export function removeItem(key)
 {
-    list.removeItem(key);
+    localStorage.removeItem(key);
 }
 
-export function setItem(list, key, obj)
+export function getLength() {
+	return (localStorage.length);
+}
+
+export function key(index)
 {
-    list.setItem(key, JSON.stringify(obj));
+	return (localStorage.key(index));
+}
+
+export function setItem(key, obj)
+{
+    localStorage.setItem(key, JSON.stringify(obj));
 }

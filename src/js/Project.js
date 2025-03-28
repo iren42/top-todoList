@@ -28,12 +28,12 @@ function isTodo(string_) {
 export const project = (function() {
 	function updateFromTodoToProject(todoObj, formData) {
 		// update Todo obj
-		updateTodo(localStorage, todoObj, Object.fromEntries(formData));
+		updateTodo(todoObj, Object.fromEntries(formData));
 
 		// update Project obj with Todo obj
-		const updatedTodo = project.get(localStorage, todoObj.id);
-		const projectObj = project.get(localStorage, updatedTodo.projectID);
-		update(localStorage, projectObj, updatedTodo);
+		const updatedTodo = get(todoObj.id);
+		const projectObj = get(updatedTodo.projectID);
+		update(projectObj, updatedTodo);
 	}
 
 	function toggleCheckbox(todoObj, element) {
@@ -43,18 +43,18 @@ export const project = (function() {
 		if (element.checked)
 			buf.isChecked = "on";
 
-		updateTodo(localStorage, todoObj, buf);
+		updateTodo(todoObj, buf);
 
 		// update Project obj with Todo obj
-		const updatedTodo = project.get(localStorage, todoObj.id);
-		const projectObj = project.get(localStorage, todoObj.projectID);
-		update(localStorage, projectObj, updatedTodo);
+		const updatedTodo = get(todoObj.id);
+		const projectObj = get(todoObj.projectID);
+		update(projectObj, updatedTodo);
 	}
 
-	function removeTodoSurplus(database, projectObject, limit) {
-		for (let i = 0; i < database.length; i++) {
-			const key = database.key(i);
-			const stored = Storage.getItem(database, key);
+	function removeTodoSurplus(projectObject, limit) {
+		for (let i = 0; i < Storage.getLength(); i++) {
+			const key = Storage.key(i);
+			const stored = Storage.getItem(key);
 			if (!stored)
 				throw new Error(ERROR.KEY(key));
 			if (stored.type === PROJECT_TYPE)
@@ -67,13 +67,13 @@ export const project = (function() {
 			if (Number(number_) < limit)
 				continue;
 
-			remove(localStorage, key);
+			Storage.removeItem(key);
 		}
 	}
 
-	function updateTodoList(database, projectObject) {
+	function updateTodoList(projectObject) {
 		const lines = projectObject.content.split('\n');
-		removeTodoSurplus(database, projectObject, lines.length);
+		removeTodoSurplus(projectObject, lines.length);
 		for (const [i, line] of lines.entries()) {
 			const title = line.slice(TODO_PREFIX.length);
 			const key = todoController.getKey(i, projectObject.id);
@@ -87,29 +87,29 @@ export const project = (function() {
 			};
 
 			if (!isTodo(line)) {
-				Storage.removeItem(database, key);
+				Storage.removeItem(key);
 				continue;
 			}
 
-			const todo = Storage.getItem(database, key);
+			const todo = Storage.getItem(key);
 			if (todo) {
-				todoController.update(localStorage, todo, buf);
+				todoController.update(todo, buf);
 			}
 			else
-				todoController.create(database, projectObject.id, i, buf);
+				todoController.create(projectObject.id, i, buf);
 		}
 	}
 
-	function create(database) {
+	function create() {
 		const newProject = new Project();
-		Storage.setItem(database, newProject.id, newProject);
+		Storage.setItem(newProject.id, newProject);
 		return (newProject);
 	}
 
 	// 'delete' is a reserved word
-	function remove(database, key) {
+	function remove(key) {
 		console.log('remove ' + key);
-		Storage.removeItem(database, key);
+		Storage.removeItem(key);
 	}
 
 	function updateContentWithTodo(target, source) {
@@ -126,42 +126,42 @@ export const project = (function() {
 		target.content = lines.join("\n");
 	}
 
-	function update(database, target, source) {
+	function update(target, source) {
 		if (target.type !== PROJECT_TYPE)
 			return;
 		if (source.type === TODO_TYPE)
 			updateContentWithTodo(target, source);
 		else
 			target.content = source.content;
-		Storage.setItem(database, target.id, target);
+		Storage.setItem(target.id, target);
 	}
 
-	function get(database, key) {
-		const projectObject = Storage.getItem(database, key);
+	function get(key) {
+		const projectObject = Storage.getItem(key);
 		if (!projectObject)
 			return (null);
 
 		return (projectObject);
 	}
 
-	function updateTodo(database, target, source) {
-		todoController.update(database, target, source);
+	function updateTodo(target, source) {
+		todoController.update(target, source);
 	}
 
-	function rename(database, key, newName) {
-		const stored = Storage.getItem(database, key);
+	function rename(key, newName) {
+		const stored = Storage.getItem(key);
 		if (!stored)
 			throw new Error(ERROR.KEY(key));
 		if (stored.type !== PROJECT_TYPE)
 			return;
 
 		stored.name = newName;
-		Storage.setItem(database, stored.id, stored);
+		Storage.setItem(stored.id, stored);
 		console.log(`renamed project to ${stored.name}`);
 	}
 
-	function clearAll(database) {
-		Storage.clear(database);
+	function clearAll() {
+		Storage.clear();
 	}
 
 	return ({

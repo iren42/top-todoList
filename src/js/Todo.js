@@ -27,16 +27,16 @@ function Todo(projectID, lineNumber, title = "", isChecked = "off")
 
 export const todoController = (function ()
 {
-    function create(database, projectID, lineNumber, { title, isChecked })
+    function create(projectID, lineNumber, { title, isChecked })
     {
         const todo = new Todo(projectID, lineNumber, title, isChecked);
-        Storage.setItem(database, todo.id, todo);
+        Storage.setItem(todo.id, todo);
     }
 
-    function update(database, target, source)
+    function update(target, source)
     {
         Object.assign(target, source);
-        Storage.setItem(database, target.id, target);
+        Storage.setItem(target.id, target);
     }
 
     function getKey(lineNumber, projectID)
@@ -44,10 +44,10 @@ export const todoController = (function ()
         return (`${ lineNumber }${ TODO_SEPARATOR }${ projectID }`);
     }
 
-    function get(database, key)
+    function get(key)
     {
 
-        const todo = Storage.getItem(database, key);
+        const todo = Storage.getItem(key);
         if (!todo)
             return (null);
         return (todo);

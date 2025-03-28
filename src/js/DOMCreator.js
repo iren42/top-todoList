@@ -14,15 +14,15 @@ const TITLE_SEPARATOR = "titl:";
 export const DOMCreator = (function ()
 {
 	const CONTENTEDITABLE = "plaintext-only";
-    function updateSidebar(database)
+    function updateSidebar()
     {
         const projectListDiv = document.querySelector(".projectList");
         projectListDiv.innerHTML = "";
 
-        for (let i = 0; i < database.length; i++)
+        for (let i = 0; i < Storage.getLength(); i++)
         {
-            const key = database.key(i);
-            const stored = Storage.getItem(database, key);
+            const key = Storage.key(i);
+            const stored = Storage.getItem(key);
             if (!stored)
                 return;
             if (stored.type === PROJECT_TYPE)
@@ -163,9 +163,9 @@ export const DOMCreator = (function ()
         checkTodoInput(IDArray);
     }
 
-	function updateEditor(database, projectID)
+	function updateEditor(projectID)
 	{
-		const projectObj = Storage.getItem(database, projectID);
+		const projectObj = Storage.getItem(projectID);
 		if (!projectObj)
 			return;
 		const leftDiv = document.querySelector(".left");

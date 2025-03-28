@@ -6,6 +6,7 @@ import { project } from "./js/Project.js"
 import { DOMCreator } from "./js/DOMCreator.js";
 import { TODO_TYPE } from "./js/Todo.js";
 import * as ERROR from "./js/error_constants.js";
+import * as Storage from "./js/storage.js";
 
 if (process.env.NODE_ENV !== 'production') {
 	console.log('Looks like we are in development mode!');
@@ -61,12 +62,12 @@ if (process.env.NODE_ENV !== 'production') {
 			isBefore(date, addDays(new Date(), 6)));
 	}
 
-	function createTodoFNList(database, fnDateInterval) {
+	function createTodoFNList(fnDateInterval) {
 		const todoArr = [];
 
-		for (let i = 0; i < database.length; i++) {
-			const key = database.key(i);
-			const stored = project.get(database, key);
+		for (let i = 0; i < Storage.getLength(); i++) {
+			const key = Storage.key(i);
+			const stored = project.get(key);
 			if (!stored)
 				continue;
 			if (stored.type !== TODO_TYPE)
@@ -77,11 +78,11 @@ if (process.env.NODE_ENV !== 'production') {
 		return (todoArr);
 	}
 
-	function createArrayOfSortedTodos(database, projectID) {
+	function createArrayOfSortedTodos(projectID) {
 		const todoArray = [];
-		for (let i = 0; i < database.length; i++) {
-			const key = database.key(i);
-			const stored = project.get(database, key);
+		for (let i = 0; i < Storage.getLength(); i++) {
+			const key = Storage.key(i);
+			const stored = project.get(key);
 			if (!stored)
 				continue;
 			if (stored.type !== TODO_TYPE)
@@ -103,9 +104,9 @@ if (process.env.NODE_ENV !== 'production') {
 		removeActiveClasses();
 		IDElement.classList.add("active");
 
-		DOMCreator.updateEditor(localStorage, projectObj.id);
+		DOMCreator.updateEditor(projectObj.id);
 
-		const todoArr = createArrayOfSortedTodos(localStorage, projectObj.id);
+		const todoArr = createArrayOfSortedTodos(projectObj.id);
 		DOMCreator.updateTodoList(todoArr);
 	}
 
@@ -123,7 +124,7 @@ if (process.env.NODE_ENV !== 'production') {
 		if (!textEl)
 			throw new Error(ERROR.CLASS("project-text"));
 
-		project.rename(localStorage, IDElement.id, textEl.innerText);
+		project.rename(IDElement.id, textEl.innerText);
 		eventTarget.contentEditable = false;
 	}
 
@@ -162,12 +163,12 @@ if (process.env.NODE_ENV !== 'production') {
 				if (!IDElement.id)
 					throw new Error(ERROR.ID(IDElement));
 
-				const todoObj = project.get(localStorage, IDElement.id);
+				const todoObj = project.get(IDElement.id);
 				if (!todoObj)
 					throw new Error(ERROR.KEY(IDElement.id));
 
 				project.toggleCheckbox(todoObj, event.target);
-				DOMCreator.updateEditor(localStorage, todoObj.projectID);
+				DOMCreator.updateEditor(todoObj.projectID);
 
 				console.log("change state of checkbox to " + event.target.checked);
 			}
@@ -182,7 +183,7 @@ if (process.env.NODE_ENV !== 'production') {
 			if (!event.target.id)
 				throw new Error(ERROR.ID(event.target));
 
-			const todoObj = project.get(localStorage, event.target.id);
+			const todoObj = project.get(event.target.id);
 			if (!todoObj)
 				throw new Error(ERROR.KEY(event.target.id));
 
@@ -190,9 +191,9 @@ if (process.env.NODE_ENV !== 'production') {
 			project.updateFromTodoToProject(todoObj, formData);
 
 			// update DOM
-			const todoArr = createArrayOfSortedTodos(localStorage, todoObj.projectID);
+			const todoArr = createArrayOfSortedTodos(todoObj.projectID);
 			DOMCreator.updateTodoList(todoArr);
-			DOMCreator.updateEditor(localStorage, todoObj.projectID);
+			DOMCreator.updateEditor(todoObj.projectID);
 			console.log("save todo");
 		} catch (error) {
 			console.error(error);
@@ -207,7 +208,7 @@ if (process.env.NODE_ENV !== 'production') {
 		removeActiveClasses();
 		IDElement.classList.add("active");
 
-		const todoArr = createTodoFNList(localStorage, fnDateInterval);
+		const todoArr = createTodoFNList(fnDateInterval);
 		DOMCreator.updateTodoList(todoArr);
 	}
 
@@ -232,8 +233,8 @@ if (process.env.NODE_ENV !== 'production') {
 				if (!projectID)
 					throw new Error(`No dataset projectid`);
 
-				project.remove(localStorage, IDElement.id);
-				const todoArr = createArrayOfSortedTodos(localStorage, projectID);
+				project.remove(IDElement.id);
+				const todoArr = createArrayOfSortedTodos(projectID);
 				DOMCreator.updateTodoList(todoArr);
 			}
 			else if (event.target.closest(".expand-todo")) {
@@ -250,9 +251,9 @@ if (process.env.NODE_ENV !== 'production') {
 				if (!IDElement.id)
 					throw new Error(ERROR.ID(IDElement));
 
-				project.remove(localStorage, IDElement.id);
+				project.remove(IDElement.id);
 				clearAll();
-				DOMCreator.updateSidebar(localStorage);
+				DOMCreator.updateSidebar();
 			}
 			else if (event.target.closest(".rename-project")) {
 				let IDElement = findParentElByClass(event.target, "project");
@@ -267,15 +268,15 @@ if (process.env.NODE_ENV !== 'production') {
 			}
 			else if (event.target.closest("#addNewProject")) {
 				console.log("add a new project");
-				const newProject = project.create(localStorage);
-				DOMCreator.updateSidebar(localStorage);
+				const newProject = project.create();
+				DOMCreator.updateSidebar();
 				openProject(newProject);
 			}
 			else if (event.target.closest("#clearBtn")) {
 				console.log("clear data");
 				clearAll();
-				project.clearAll(localStorage);
-				DOMCreator.updateSidebar(localStorage);
+				project.clearAll();
+				DOMCreator.updateSidebar();
 			}
 			else if (event.target.closest("#saveBtn")) {
 				console.log("saving");
@@ -291,14 +292,14 @@ if (process.env.NODE_ENV !== 'production') {
 					throw new Error("No editor");
 				let editorText = removeBR(editor.innerText);
 
-				const projectObj = project.get(localStorage, IDElement.id);
+				const projectObj = project.get(IDElement.id);
 				if (!projectObj)
 					throw new Error(ERROR.KEY(IDElement.id));
 
-				project.update(localStorage, projectObj, { content: editorText });
-				project.updateTodoList(localStorage, projectObj);
+				project.update(projectObj, { content: editorText });
+				project.updateTodoList(projectObj);
 
-				const todoArr = createArrayOfSortedTodos(localStorage, projectObj.id);
+				const todoArr = createArrayOfSortedTodos(projectObj.id);
 				DOMCreator.updateTodoList(todoArr);
 			}
 			else if (event.target.closest("button.project")) {
@@ -308,7 +309,7 @@ if (process.env.NODE_ENV !== 'production') {
 				if (!IDElement.id)
 					throw new Error(ERROR.ID(IDElement));
 
-				const projectObj = project.get(localStorage, IDElement.id);
+				const projectObj = project.get(IDElement.id);
 				if (!projectObj)
 					throw new Error(ERROR.KEY(IDElement.id));
 				openProject(projectObj);
@@ -319,7 +320,7 @@ if (process.env.NODE_ENV !== 'production') {
 		}
 	});
 
-	DOMCreator.updateSidebar(localStorage);
-	const todayArr = createTodoFNList(localStorage, isToday);
+	DOMCreator.updateSidebar();
+	const todayArr = createTodoFNList(isToday);
 	DOMCreator.updateTodoList(todayArr);
 }
