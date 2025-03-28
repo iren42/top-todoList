@@ -78,7 +78,7 @@ export const DOMCreator = (function ()
         const li = document.createElement("li");
 
         const form = document.createElement("form");
-        form.classList.add("todo", "collapse");
+        form.classList.add("todo", "collapse", obj.priority);
         form.id = obj.id;
         form.dataset.projectid = obj.projectID;
         form.innerHTML = `

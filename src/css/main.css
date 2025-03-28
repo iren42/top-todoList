@@ -91,7 +91,6 @@
 
 	.description {
 		margin-bottom: var(--spacing-xs);
-		background-color: var(--light);
 	}
 
 	fieldset {
@@ -187,6 +186,14 @@
 			}
 		}
 	}
+}
+
+.todo.medium {
+	background-color: var(--priority-medium);
+}
+
+.todo.high {
+	background-color: var(--priority-high);
 }
 
 .todo.collapse {

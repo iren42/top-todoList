@@ -36,6 +36,9 @@
 	--dark-grey: #AFAFB0;
 	--blue: #0087af;
 
+	--priority-medium: green;
+	--priority-high: orange;
+
     /* --darker-grey: #A4A5A6; */
 	--foreground: var(--dark);
 	--background: var(--light);
