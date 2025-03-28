@@ -166,20 +166,8 @@ if (process.env.NODE_ENV !== 'production') {
 				if (!todoObj)
 					throw new Error(ERROR.KEY(IDElement.id));
 
-				const buf = {
-					isChecked: "off"
-				};
-				if (event.target.checked)
-					buf.isChecked = "on";
-
-				project.updateTodo(localStorage, todoObj, buf);
-
-				// update Project obj with Todo obj
-				const updatedTodo = project.get(localStorage, todoObj.id);
-				const projectObj = project.get(localStorage, todoObj.projectID);
-				project.update(localStorage, projectObj, updatedTodo);
-
-				DOMCreator.updateEditor(localStorage, projectObj.id);
+				project.toggleCheckbox(todoObj, event.target);
+				DOMCreator.updateEditor(localStorage, todoObj.projectID);
 
 				console.log("change state of checkbox to " + event.target.checked);
 			}
@@ -198,19 +186,13 @@ if (process.env.NODE_ENV !== 'production') {
 			if (!todoObj)
 				throw new Error(ERROR.KEY(event.target.id));
 
-			// update Todo obj
 			const formData = new FormData(event.target);
-			project.updateTodo(localStorage, todoObj, Object.fromEntries(formData));
-
-			// update Project obj with Todo obj
-			const updatedTodo = project.get(localStorage, todoObj.id);
-			const projectObj = project.get(localStorage, updatedTodo.projectID);
-			project.update(localStorage, projectObj, updatedTodo);
+			project.updateFromTodoToProject(todoObj, formData);
 
 			// update DOM
-			const todoArr = createArrayOfSortedTodos(localStorage, updatedTodo.projectID);
+			const todoArr = createArrayOfSortedTodos(localStorage, todoObj.projectID);
 			DOMCreator.updateTodoList(todoArr);
-			DOMCreator.updateEditor(localStorage, projectObj.id);
+			DOMCreator.updateEditor(localStorage, todoObj.projectID);
 			console.log("save todo");
 		} catch (error) {
 			console.error(error);
@@ -312,8 +294,10 @@ if (process.env.NODE_ENV !== 'production') {
 				const projectObj = project.get(localStorage, IDElement.id);
 				if (!projectObj)
 					throw new Error(ERROR.KEY(IDElement.id));
+
 				project.update(localStorage, projectObj, { content: editorText });
 				project.updateTodoList(localStorage, projectObj);
+
 				const todoArr = createArrayOfSortedTodos(localStorage, projectObj.id);
 				DOMCreator.updateTodoList(todoArr);
 			}

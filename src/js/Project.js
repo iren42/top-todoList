@@ -26,6 +26,31 @@ function isTodo(string_) {
 }
 
 export const project = (function() {
+	function updateFromTodoToProject(todoObj, formData) {
+		// update Todo obj
+		updateTodo(localStorage, todoObj, Object.fromEntries(formData));
+
+		// update Project obj with Todo obj
+		const updatedTodo = project.get(localStorage, todoObj.id);
+		const projectObj = project.get(localStorage, updatedTodo.projectID);
+		update(localStorage, projectObj, updatedTodo);
+	}
+
+	function toggleCheckbox(todoObj, element) {
+		const buf = {
+			isChecked: "off"
+		};
+		if (element.checked)
+			buf.isChecked = "on";
+
+		updateTodo(localStorage, todoObj, buf);
+
+		// update Project obj with Todo obj
+		const updatedTodo = project.get(localStorage, todoObj.id);
+		const projectObj = project.get(localStorage, todoObj.projectID);
+		update(localStorage, projectObj, updatedTodo);
+	}
+
 	function removeTodoSurplus(database, projectObject, limit) {
 		for (let i = 0; i < database.length; i++) {
 			const key = database.key(i);
@@ -87,8 +112,7 @@ export const project = (function() {
 		Storage.removeItem(database, key);
 	}
 
-	function updateContentWithTodo(target, source)
-	{
+	function updateContentWithTodo(target, source) {
 		const lines = target.content.split("\n");
 		const regex = new RegExp(`(?<=^.{${TODO_PREFIX.length}}).*`);
 		let newLine;
@@ -149,5 +173,7 @@ export const project = (function() {
 		remove,
 		clearAll,
 		rename,
+		toggleCheckbox,
+		updateFromTodoToProject,
 	});
 })();
