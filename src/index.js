@@ -168,7 +168,10 @@ if (process.env.NODE_ENV !== 'production') {
 					throw new Error(ERROR.KEY(IDElement.id));
 
 				project.toggleCheckbox(todoObj, event.target);
-				DOMCreator.updateEditor(todoObj.projectID);
+
+				const active = document.querySelector(".active");
+				if (active.classList.contains("project"))
+					DOMCreator.updateEditor(todoObj.projectID);
 
 				console.log("change state of checkbox to " + event.target.checked);
 			}
