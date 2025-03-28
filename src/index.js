@@ -31,6 +31,23 @@ if (process.env.NODE_ENV !== 'production') {
 {
 	const todoListDiv = document.querySelector(".todoList");
 
+	const overviewToday = {
+		id: "todo-today", // needs to be the same as the ID in template.html
+		fn: isToday
+	};
+
+	const overviewSeven = {
+		id: "todo-seven",
+		fn: isNextSevenDays
+	}
+
+	const overviewAll = {
+		id: "todo-all",
+		fn: () => 1
+	}
+
+	const overviewList = [overviewToday, overviewSeven, overviewAll];
+
 	function clearAll() {
 		const leftDiv = document.querySelector(".left");
 		leftDiv.innerHTML = "";
@@ -183,6 +200,7 @@ if (process.env.NODE_ENV !== 'production') {
 	todoListDiv.addEventListener("submit", event => {
 		try {
 			event.preventDefault();
+			console.log("save todo");
 			if (!event.target.id)
 				throw new Error(ERROR.ID(event.target));
 
@@ -194,13 +212,20 @@ if (process.env.NODE_ENV !== 'production') {
 			project.updateFromTodoToProject(todoObj, formData);
 
 			// update DOM
-			const todoArr = createArrayOfSortedTodos(todoObj.projectID);
-			DOMCreator.updateTodoList(todoArr);
-
 			const active = document.querySelector(".active");
-			if (active.classList.contains("project"))
-				DOMCreator.updateEditor(todoObj.projectID);
-			console.log("save todo");
+			if (!active)
+				throw new Error(ERROR.CLASS("active"));
+
+			if (active.classList.contains("project")) {
+				const projectObj = project.get(todoObj.projectID);
+				openProject(projectObj);
+			}
+			else {
+				const ov = overviewList.find(element => element.id === active.id);
+				if (!ov)
+					throw new Error(ERROR.ID(active.id));
+				openOverview(ov);
+			}
 		} catch (error) {
 			console.error(error);
 		}
@@ -213,32 +238,41 @@ if (process.env.NODE_ENV !== 'production') {
 			return (-1);
 		if (isAfter(a.dueDate, b.dueDate))
 			return (1);
+		if (a.dueDate === b.dueDate) {
+			if (!a.dueTime)
+				return (1);
+			if (!b.dueTime)
+				return (-1);
+			if (a.dueTime >  b.dueTime)
+				return (1);
+			if (a.dueTime === b.dueTime)
+				return (0);
+		}
 		return (-1);
 	}
 
-	function openOverview(element, fnDateInterval) {
-		let IDElement = findParentElByClass(element, "overview");
-		if (!IDElement)
-			throw new Error(ERROR.CLASS("overview"));
+	function openOverview(overviewObj) {
 		clearAll();
+		const IDElement = document.querySelector(`#${CSS.escape(overviewObj.id)}`);
 		removeActiveClasses();
 		IDElement.classList.add("active");
 
-		const todoArr = createTodoFNList(fnDateInterval);
+		const todoArr = createTodoFNList(overviewObj.fn);
 		todoArr.sort(sortDates);
 		DOMCreator.updateTodoList(todoArr);
 	}
 
 	document.addEventListener("click", event => {
 		try {
-			if (event.target.closest("#todo-all")) {
-				openOverview(event.target, () => 1);
-			}
-			else if (event.target.closest("#todo-seven")) {
-				openOverview(event.target, isNextSevenDays);
-			}
-			else if (event.target.closest("#todo-today")) {
-				openOverview(event.target, isToday);
+			if (event.target.closest(".overview")) {
+				let IDElement = findParentElByClass(event.target, "overview");
+				if (!IDElement)
+					throw new Error(ERROR.CLASS("overview"));
+
+				const ov = overviewList.find(element => element.id === IDElement.id);
+				if (!ov)
+					throw new Error(ERROR.ID(IDElement.id));
+				openOverview(ov);
 			}
 			else if (event.target.closest(".delete-todo")) {
 				let IDElement = findParentElByClass(event.target, "todo");
@@ -338,6 +372,5 @@ if (process.env.NODE_ENV !== 'production') {
 	});
 
 	DOMCreator.updateSidebar();
-	const todayArr = createTodoFNList(isToday);
-	DOMCreator.updateTodoList(todayArr);
+	openOverview(overviewToday);
 }
