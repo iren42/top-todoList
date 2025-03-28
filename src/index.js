@@ -200,6 +200,16 @@ if (process.env.NODE_ENV !== 'production') {
 		}
 	})
 
+	function sortDates(a, b) {
+		if (!a.dueDate)
+			return (1);
+		if (!b.dueDate)
+			return (-1);
+		if (isAfter(a.dueDate, b.dueDate))
+			return (1);
+		return (-1);
+	}
+
 	function openOverview(element, fnDateInterval) {
 		let IDElement = findParentElByClass(element, "overview");
 		if (!IDElement)
@@ -209,6 +219,7 @@ if (process.env.NODE_ENV !== 'production') {
 		IDElement.classList.add("active");
 
 		const todoArr = createTodoFNList(fnDateInterval);
+		todoArr.sort(sortDates);
 		DOMCreator.updateTodoList(todoArr);
 	}
 
