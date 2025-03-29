@@ -1,12 +1,9 @@
 import "./css/normalize.css";
 import "./css/style.css";
 
-import { isBefore, isAfter, isToday, addDays, subDays } from "date-fns";
 import { project } from "./js/Project.js"
-import { DOMCreator } from "./js/DOMCreator.js";
-import { TODO_TYPE } from "./js/Todo.js";
+import { CONTENTEDITABLE, DOMCreator } from "./js/DOMCreator.js";
 import * as ERROR from "./js/error_constants.js";
-import * as Storage from "./js/storage.js";
 
 if (process.env.NODE_ENV !== 'production') {
 	console.log('Looks like we are in development mode!');
@@ -29,40 +26,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 {
-	const todoListDiv = document.querySelector(".todoList");
-
-	const overviewToday = {
-		id: "todo-today", // needs to be the same as the ID in template.html
-		fn: isToday
-	};
-
-	const overviewSeven = {
-		id: "todo-seven",
-		fn: isNextSevenDays
-	}
-
-	const overviewAll = {
-		id: "todo-all",
-		fn: () => 1
-	}
-
-	const overviewList = [overviewToday, overviewSeven, overviewAll];
-
-	function clearAll() {
-		const leftDiv = document.querySelector(".left");
-		leftDiv.innerHTML = "";
-		todoListDiv.innerHTML = "";
-	}
-
-	function removeActiveClasses() {
-		const list = document.querySelectorAll(".active");
-		if (!list)
-			return;
-		for (let i = 0; i < list.length; i++) {
-			list[i].classList.remove("active");
-		}
-	}
-
 	function findParentElByClass(element, className) {
 		if (!(element instanceof HTMLElement))
 			throw new Error(`Not a HTMLElement ${element}`);
@@ -72,59 +35,6 @@ if (process.env.NODE_ENV !== 'production') {
 			}
 		}
 		return (element);
-	}
-
-	function isNextSevenDays(date) {
-		return (isAfter(date, subDays(new Date(), 1)) &&
-			isBefore(date, addDays(new Date(), 6)));
-	}
-
-	function createTodoFNList(fnDateInterval) {
-		const todoArr = [];
-
-		for (let i = 0; i < Storage.getLength(); i++) {
-			const key = Storage.key(i);
-			const stored = project.get(key);
-			if (!stored)
-				continue;
-			if (stored.type !== TODO_TYPE)
-				continue;
-			if (fnDateInterval(stored.dueDate))
-				todoArr.push(stored);
-		}
-		return (todoArr);
-	}
-
-	function createArrayOfSortedTodos(projectID) {
-		const todoArray = [];
-		for (let i = 0; i < Storage.getLength(); i++) {
-			const key = Storage.key(i);
-			const stored = project.get(key);
-			if (!stored)
-				continue;
-			if (stored.type !== TODO_TYPE)
-				continue;
-			if (stored.projectID !== projectID)
-				continue;
-			todoArray.push(stored);
-		}
-		todoArray.sort((a, b) => a.lineNumber - b.lineNumber)
-		return (todoArray);
-	}
-
-
-	function openProject(projectObj) {
-		clearAll();
-		const IDElement = document.querySelector(`#${CSS.escape(projectObj.id)}`);
-
-		// only one 'active' HTMLelement
-		removeActiveClasses();
-		IDElement.classList.add("active");
-
-		DOMCreator.updateEditor(projectObj.id);
-
-		const todoArr = createArrayOfSortedTodos(projectObj.id);
-		DOMCreator.updateTodoList(todoArr);
 	}
 
 	function removeBR(str) {
@@ -145,11 +55,21 @@ if (process.env.NODE_ENV !== 'production') {
 		eventTarget.contentEditable = false;
 	}
 
+	function removeActiveClasses() {
+		const list = document.querySelectorAll(".active");
+		if (!list)
+			return;
+		for (let i = 0; i < list.length; i++) {
+			list[i].classList.remove("active");
+		}
+	}
+
 	const projectListDiv = document.querySelector("ul.projectList");
 	projectListDiv.addEventListener("focusout", event => {
 		try {
 			if (event.target.closest(".project-text")) {
 				renameProject(event.target);
+				DOMCreator.updateActive();
 			}
 		} catch (error) {
 			console.error(error);
@@ -161,12 +81,14 @@ if (process.env.NODE_ENV !== 'production') {
 			if (event.key === "Enter" && event.target.closest(".project-text")) {
 				event.preventDefault();
 				renameProject(event.target);
+				DOMCreator.updateActive();
 			}
 		} catch (error) {
 			console.error(error);
 		}
 	})
 
+	const todoListDiv = document.querySelector(".todoList");
 	todoListDiv.addEventListener("change", event => {
 		try {
 			if (event.target.closest("input[type='checkbox']")) {
@@ -179,6 +101,7 @@ if (process.env.NODE_ENV !== 'production') {
 					throw new Error(ERROR.CLASS("todo"));
 				if (!IDElement.id)
 					throw new Error(ERROR.ID(IDElement));
+				console.log("change state of checkbox to " + event.target.checked);
 
 				const todoObj = project.get(IDElement.id);
 				if (!todoObj)
@@ -186,11 +109,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 				project.toggleCheckbox(todoObj, event.target);
 
-				const active = document.querySelector(".active");
-				if (active.classList.contains("project"))
-					DOMCreator.updateEditor(todoObj.projectID);
-
-				console.log("change state of checkbox to " + event.target.checked);
+				DOMCreator.updateActive();
 			}
 		} catch (error) {
 			console.error(error);
@@ -200,81 +119,26 @@ if (process.env.NODE_ENV !== 'production') {
 	todoListDiv.addEventListener("submit", event => {
 		try {
 			event.preventDefault();
-			console.log("save todo");
 			if (!event.target.id)
 				throw new Error(ERROR.ID(event.target));
 
 			const todoObj = project.get(event.target.id);
 			if (!todoObj)
 				throw new Error(ERROR.KEY(event.target.id));
+			console.log("save todo");
 
 			const formData = new FormData(event.target);
 			project.updateFromTodoToProject(todoObj, formData);
 
-			// update DOM
-			const active = document.querySelector(".active");
-			if (!active)
-				throw new Error(ERROR.CLASS("active"));
-
-			if (active.classList.contains("project")) {
-				const projectObj = project.get(todoObj.projectID);
-				openProject(projectObj);
-			}
-			else {
-				const ov = overviewList.find(element => element.id === active.id);
-				if (!ov)
-					throw new Error(ERROR.ID(active.id));
-				openOverview(ov);
-			}
+			DOMCreator.updateActive();
 		} catch (error) {
 			console.error(error);
 		}
 	})
 
-	function sortDates(a, b) {
-		if (!a.dueDate)
-			return (1);
-		if (!b.dueDate)
-			return (-1);
-		if (isAfter(a.dueDate, b.dueDate))
-			return (1);
-		if (a.dueDate === b.dueDate) {
-			if (!a.dueTime)
-				return (1);
-			if (!b.dueTime)
-				return (-1);
-			if (a.dueTime >  b.dueTime)
-				return (1);
-			if (a.dueTime === b.dueTime)
-				return (0);
-		}
-		return (-1);
-	}
-
-	function openOverview(overviewObj) {
-		clearAll();
-		const IDElement = document.querySelector(`#${CSS.escape(overviewObj.id)}`);
-		removeActiveClasses();
-		IDElement.classList.add("active");
-
-		const todoArr = createTodoFNList(overviewObj.fn);
-		todoArr.sort(sortDates);
-		DOMCreator.updateTodoList(todoArr);
-	}
-
 	document.addEventListener("click", event => {
 		try {
-			if (event.target.closest(".overview")) {
-				let IDElement = findParentElByClass(event.target, "overview");
-				if (!IDElement)
-					throw new Error(ERROR.CLASS("overview"));
-
-				const ov = overviewList.find(element => element.id === IDElement.id);
-				if (!ov)
-					throw new Error(ERROR.ID(IDElement.id));
-				openOverview(ov);
-			}
-			else if (event.target.closest(".delete-todo")) {
+			if (event.target.closest(".delete-todo")) {
 				let IDElement = findParentElByClass(event.target, "todo");
 				if (!IDElement)
 					throw new Error(ERROR.CLASS("todo"));
@@ -285,8 +149,7 @@ if (process.env.NODE_ENV !== 'production') {
 					throw new Error(`No dataset projectid`);
 
 				project.remove(IDElement.id);
-				const todoArr = createArrayOfSortedTodos(projectID);
-				DOMCreator.updateTodoList(todoArr);
+				DOMCreator.updateActive();
 			}
 			else if (event.target.closest(".expand-todo")) {
 				let IDElement = findParentElByClass(event.target, "todo");
@@ -302,11 +165,13 @@ if (process.env.NODE_ENV !== 'production') {
 				if (!IDElement.id)
 					throw new Error(ERROR.ID(IDElement));
 
+				console.log("delete project");
 				project.remove(IDElement.id);
-				clearAll();
 				DOMCreator.updateSidebar();
+				DOMCreator.updateActive();
 			}
 			else if (event.target.closest(".rename-project")) {
+				console.log("here");
 				let IDElement = findParentElByClass(event.target, "project");
 				if (!IDElement)
 					throw new Error(ERROR.CLASS("project"));
@@ -314,6 +179,7 @@ if (process.env.NODE_ENV !== 'production') {
 				if (!textEl)
 					throw new Error(ERROR.CLASS("project-text"));
 
+				console.log("here");
 				textEl.contentEditable = CONTENTEDITABLE;
 				textEl.focus();
 			}
@@ -321,16 +187,21 @@ if (process.env.NODE_ENV !== 'production') {
 				console.log("add a new project");
 				const newProject = project.create();
 				DOMCreator.updateSidebar();
-				openProject(newProject);
+
+				removeActiveClasses();
+
+				const projectEl = document.querySelector(`#${CSS.escape(newProject.id)}`);
+				projectEl.classList.add("active");
+				DOMCreator.updateActive();
 			}
 			else if (event.target.closest("#clearBtn")) {
-				console.log("clear data");
-				clearAll();
+				console.log("clear all data");
 				project.clearAll();
 				DOMCreator.updateSidebar();
+				DOMCreator.updateActive();
 			}
 			else if (event.target.closest("#saveBtn")) {
-				console.log("saving");
+				console.log("save project");
 				const IDElement = document.querySelector(".project.active");
 				if (!IDElement)
 					throw new Error(ERROR.CLASS("project active"));
@@ -350,20 +221,34 @@ if (process.env.NODE_ENV !== 'production') {
 				project.update(projectObj, { content: editorText });
 				project.updateTodoList(projectObj);
 
-				const todoArr = createArrayOfSortedTodos(projectObj.id);
-				DOMCreator.updateTodoList(todoArr);
+				DOMCreator.updateActive();
 			}
-			else if (event.target.closest("button.project")) {
+			else if (event.target.closest(".overview")) {
+				let IDElement = findParentElByClass(event.target, "overview");
+				if (!IDElement)
+					throw new Error(ERROR.CLASS("overview"));
+				if (!IDElement.id)
+					throw new Error(ERROR.ID(IDElement));
+
+				// only one 'active' HTMLelement
+				removeActiveClasses();
+				IDElement.classList.add("active");
+
+				DOMCreator.updateActive();
+			}
+			else if (event.target.closest(".project")) {
 				let IDElement = findParentElByClass(event.target, "project");
 				if (!IDElement)
 					throw new Error(ERROR.CLASS("project"));
 				if (!IDElement.id)
 					throw new Error(ERROR.ID(IDElement));
 
-				const projectObj = project.get(IDElement.id);
-				if (!projectObj)
-					throw new Error(ERROR.KEY(IDElement.id));
-				openProject(projectObj);
+				console.log("project");
+				// only one 'active' HTMLelement
+				removeActiveClasses();
+				IDElement.classList.add("active");
+
+				DOMCreator.updateActive();
 			}
 			else;
 		} catch (error) {
@@ -372,5 +257,5 @@ if (process.env.NODE_ENV !== 'production') {
 	});
 
 	DOMCreator.updateSidebar();
-	openOverview(overviewToday);
+	DOMCreator.updateActive();
 }
