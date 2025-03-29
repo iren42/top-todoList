@@ -252,6 +252,11 @@ i.dropbtn::before {
     z-index: 1;
 }
 
+.overview:only-child .dropdown-content {
+	top: auto;
+	bottom: 100%;
+}
+
 .dropdown-content div {
     padding: var(--spacing-xs) var(--spacing-sm);
     text-decoration: none;
