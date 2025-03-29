@@ -1,7 +1,8 @@
 import *  as Storage from "./storage.js";
 import { formatRelativeToNow } from "./date.js";
 import { PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.js";
-import { PROJECT_TYPE } from "./Project.js"
+import { PROJECT_TYPE } from "./Project.js";
+import * as ERROR from "./error_constants.js";
 
 const CHECKBOX_SEPARATOR = "box:";
 const DESCRIPTION_SEPARATOR = "des:";
@@ -126,12 +127,16 @@ export const DOMCreator = (function ()
         const min = document.createElement("div");
         min.classList.add("min");
 
+		const projectObj = Storage.getItem(obj.projectID);
+		if (!projectObj)
+			throw new Error(ERROR.KEY(obj.projectID));
         let dateToNow = "";
         if (obj.dueDate)
             dateToNow = formatRelativeToNow(obj.dueDate);
         min.innerHTML = `
 			<input type="checkbox" id="${ CHECKBOX_SEPARATOR }${ obj.id }" name="isChecked" autocomplete="off">
             <label for="${ CHECKBOX_SEPARATOR }${ obj.id }">${ obj.title }</label>
+			<span class="projectName">${projectObj.name}</span>
             <span class="dueDate">${ dateToNow } ${obj.dueTime}</span>
             <button type="button" class="expand-todo"><i class="fi fi-tr-square-plus"></i>
             </button>

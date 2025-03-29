@@ -144,12 +144,12 @@
 		display: grid;
 		align-items: center;
 		justify-items: center;
-		grid-template-columns: var(--icon-lg) 1fr var(--icon-lg);
+		grid-template-columns: var(--icon-lg) 1fr 1fr var(--icon-lg);
 		grid-template-rows: 75% 25%;
 		column-gap: 0.5rem;
 		grid-template-areas:
-			"input label button"
-			". dueDate dueDate";
+			"input label label button"
+			"projectName projectName dueDate dueDate";
 
 		& input[type=checkbox] {
 			grid-area: input;
@@ -162,11 +162,21 @@
 			justify-self: start;
 		}
 
+		& .projectName,
+		.dueDate {
+			align-self: start;
+			font-size: var(--font-size-sm);
+			padding: 0 var(--spacing-xxs);
+		}
+
+		& .projectName {
+			grid-area: projectName;
+			justify-self: start;
+		}
+
 		& .dueDate {
 			grid-area: dueDate;
 			justify-self: end;
-			align-self: start;
-			font-size: var(--font-size-sm);
 		}
 
 		& button {
