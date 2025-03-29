@@ -80,7 +80,7 @@ function sortDates(a, b) {
 	return (-1);
 }
 
-function createTodoFNList(fnDateInterval) {
+function createOverviewTodoList(fnDateInterval) {
 	const todoArr = [];
 	for (let i = 0; i < Storage.getLength(); i++) {
 		const key = Storage.key(i);
@@ -95,7 +95,7 @@ function createTodoFNList(fnDateInterval) {
 	return (todoArr);
 }
 
-function createArrayOfSortedTodos(projectID) {
+function createProjectTodoList(projectID) {
 	const todoArray = [];
 	for (let i = 0; i < Storage.getLength(); i++) {
 		const key = Storage.key(i);
@@ -135,12 +135,12 @@ function clearAll() {
 function openProject(projectObj) {
 	DOMCreator.updateEditor(projectObj.id);
 
-	const todoArr = createArrayOfSortedTodos(projectObj.id);
+	const todoArr = createProjectTodoList(projectObj.id);
 	DOMCreator.updateTodoList(todoArr);
 }
 
 function openOverview(overviewObj) {
-	const todoArr = createTodoFNList(overviewObj.fn);
+	const todoArr = createOverviewTodoList(overviewObj.fn);
 	todoArr.sort(sortDates);
 	DOMCreator.updateTodoList(todoArr);
 }
