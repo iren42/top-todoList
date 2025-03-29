@@ -4,7 +4,7 @@ import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.j
 import { PROJECT_TYPE } from "./Project.js";
 import * as ERROR from "./error_constants.js";
 
-import { isBefore, isAfter, isToday, addDays, subDays } from "date-fns";
+import { differenceInMinutes, isBefore, isAfter, isToday, addDays, subDays } from "date-fns";
 
 export const CONTENTEDITABLE = "plaintext-only";
 
@@ -46,23 +46,37 @@ function isNextSevenDays(date) {
 		isBefore(date, addDays(new Date(), 6)));
 }
 
+function getMinutesAndSeconds(time) {
+	let s = time.split(":");
+	if (s.length !== 2)
+		throw new Error("Time format invalid: " + time);
+	const ret = [
+		Number(s[0]),
+		Number(s[1])
+	];
+	return (ret);
+}
+
 function sortDates(a, b) {
+	if (a.dueDate === b.dueDate) {
+		if (a.dueTime === b.dueTime)
+			return (0);
+		if (!a.dueTime)
+			return (1);
+		if (!b.dueTime)
+			return (-1);
+		const [m1, s1] = getMinutesAndSeconds(a.dueTime);
+		const [m2, s2] = getMinutesAndSeconds(b.dueTime);
+		if (differenceInMinutes(new Date(2000, 1, 1, m1, s1),
+			new Date(2000, 1, 1, m2, s2)) < 0)
+			return (-1);
+	}
 	if (!a.dueDate)
 		return (1);
 	if (!b.dueDate)
 		return (-1);
 	if (isAfter(a.dueDate, b.dueDate))
 		return (1);
-	if (a.dueDate === b.dueDate) {
-		if (!a.dueTime)
-			return (1);
-		if (!b.dueTime)
-			return (-1);
-		if (a.dueTime > b.dueTime)
-			return (1);
-		if (a.dueTime === b.dueTime)
-			return (0);
-	}
 	return (-1);
 }
 
