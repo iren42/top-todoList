@@ -149,6 +149,10 @@ footer {
 	font-size: var(--icon-md);
 }
 
+.project-header__button {
+	position: relative;
+}
+
 .project-text,
 .overview-text {
 	margin-left: var(--spacing-sm);
@@ -179,6 +183,11 @@ footer {
 	opacity: 0;
 	display: none;
 	box-shadow: var(--box-shadow);
+	white-space: nowrap;
+}
+
+.project-header__button .tooltip {
+	left: var(--spacing-md);
 }
 
 .overview.active,
@@ -186,6 +195,7 @@ footer {
 	background-color: var(--grey);
 }
 
+.project-header__button:hover .tooltip,
 .project:hover .tooltip,
 .overview:hover .tooltip {
 	top: 50%;
@@ -198,6 +208,7 @@ footer {
 	align-items: center;
 }
 
+.project-header__button .tooltip,
 .sidebar.collapse .tooltip {
 	display: block;
 }
