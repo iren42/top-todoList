@@ -152,11 +152,16 @@ if (process.env.NODE_ENV !== 'production') {
 				DOMCreator.updateActive();
 			}
 			else if (event.target.closest(".expand-todo")) {
+				let button = findParentElByClass(event.target, "fi");
 				let IDElement = findParentElByClass(event.target, "todo");
 				if (!IDElement)
 					throw new Error(ERROR.CLASS("todo"));
 
 				IDElement.classList.toggle('collapse');
+				if (IDElement.classList.contains("collapse"))
+					button.classList = "fi fi-tr-square-plus";
+				else
+					button.classList = "fi fi-tr-square-minus";
 			}
 			else if (event.target.closest(".delete-project")) {
 				let IDElement = findParentElByClass(event.target, "project");
