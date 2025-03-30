@@ -1,11 +1,11 @@
 import *  as Storage from "./storage.js";
 import { formatRelativeToNow } from "./date.js";
-import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.js";
-import { PROJECT_TYPE } from "./Project.js";
+import { PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.js";
+import { PROJECT_TYPE, project } from "./Project.js";
 import * as ERROR from "./error_constants.js";
 import { overviewList } from "./overview.js";
 
-import { differenceInMinutes, isBefore, isAfter, isToday, addDays, subDays } from "date-fns";
+import { differenceInMinutes, isAfter } from "date-fns";
 
 export const CONTENTEDITABLE = "plaintext-only";
 
@@ -48,40 +48,6 @@ function sortDates(a, b) {
 	if (isAfter(a.dueDate, b.dueDate))
 		return (1);
 	return (-1);
-}
-
-function createOverviewTodoList(fnDateInterval) {
-	const todoArr = [];
-	const len = Storage.getLength();
-	for (let i = 0; i < len; i++) {
-		const key = Storage.key(i);
-		const stored = Storage.getItem(key);
-		if (!stored)
-			continue;
-		if (stored.type !== TODO_TYPE)
-			continue;
-		if (fnDateInterval(stored.dueDate))
-			todoArr.push(stored);
-	}
-	return (todoArr);
-}
-
-function createProjectTodoList(projectID) {
-	const todoArray = [];
-	const len = Storage.getLength();
-	for (let i = 0; i < len; i++) {
-		const key = Storage.key(i);
-		const stored = Storage.getItem(key);
-		if (!stored)
-			continue;
-		if (stored.type !== TODO_TYPE)
-			continue;
-		if (stored.projectID !== projectID)
-			continue;
-		todoArray.push(stored);
-	}
-	todoArray.sort((a, b) => a.lineNumber - b.lineNumber)
-	return (todoArray);
 }
 
 function checkTodoInput(list) {
@@ -137,12 +103,12 @@ function createEditor(projectObj) {
 function openProject(projectObj) {
 	createEditor(projectObj);
 
-	const todoArr = createProjectTodoList(projectObj.id);
+	const todoArr = project.createProjectTodoList(projectObj.id);
 	updateTodoList(todoArr);
 }
 
 function openOverview(overviewObj) {
-	const todoArr = createOverviewTodoList(overviewObj.fn);
+	const todoArr = project.createOverviewTodoList(overviewObj.fn);
 	todoArr.sort(sortDates);
 	updateTodoList(todoArr);
 }

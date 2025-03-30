@@ -1,6 +1,10 @@
-import { TODO_PREFIX, TODO_TYPE, TODO_PREFIX_DONE, todoController, TODO_SEPARATOR } from './Todo.js';
+import {
+	TODO_PREFIX, TODO_TYPE, TODO_PREFIX_DONE, todoController,
+	TODO_SEPARATOR
+} from './Todo.js';
 import * as Storage from './storage.js';
 import * as ERROR from './error_constants.js';
+import { isTrash } from "./overview.js";
 
 export const PROJECT_TYPE = 'PROJECT';
 
@@ -118,8 +122,7 @@ export const project = (function() {
 			throw new Error(ERROR.KEY(key));
 		const len = Storage.getLength();
 		const keysToRemove = [];
-		for (let i = 0; i < len; i++)
-		{
+		for (let i = 0; i < len; i++) {
 			const todoKey = Storage.key(i);
 			const stored = Storage.getItem(todoKey);
 			if (!stored)
@@ -187,6 +190,45 @@ export const project = (function() {
 		Storage.clear();
 	}
 
+	function removeTrash() {
+		const todoArr = createOverviewTodoList(isTrash);
+		todoArr.map(todoObj => Storage.removeItem(todoObj.id));
+	}
+
+	function createOverviewTodoList(fnDateInterval) {
+		const todoArr = [];
+		const len = Storage.getLength();
+		for (let i = 0; i < len; i++) {
+			const key = Storage.key(i);
+			const stored = Storage.getItem(key);
+			if (!stored)
+				continue;
+			if (stored.type !== TODO_TYPE)
+				continue;
+			if (fnDateInterval(stored.dueDate))
+				todoArr.push(stored);
+		}
+		return (todoArr);
+	}
+
+	function createProjectTodoList(projectID) {
+		const todoArray = [];
+		const len = Storage.getLength();
+		for (let i = 0; i < len; i++) {
+			const key = Storage.key(i);
+			const stored = Storage.getItem(key);
+			if (!stored)
+				continue;
+			if (stored.type !== TODO_TYPE)
+				continue;
+			if (stored.projectID !== projectID)
+				continue;
+			todoArray.push(stored);
+		}
+		todoArray.sort((a, b) => a.lineNumber - b.lineNumber)
+		return (todoArray);
+	}
+
 	return ({
 		updateTodoList,
 		updateTodo,
@@ -198,5 +240,8 @@ export const project = (function() {
 		rename,
 		toggleCheckbox,
 		updateFromTodoToProject,
+		removeTrash,
+		createOverviewTodoList,
+		createProjectTodoList,
 	});
 })();

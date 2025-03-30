@@ -170,8 +170,12 @@ if (process.env.NODE_ENV !== 'production') {
 				DOMCreator.updateSidebar();
 				DOMCreator.updateActive();
 			}
+			else if (event.target.closest("#emptyTrash")) {
+				console.log("empty trash");
+				project.removeTrash();
+				DOMCreator.updateActive();
+			}
 			else if (event.target.closest(".rename-project")) {
-				console.log("here");
 				let IDElement = findParentElByClass(event.target, "project");
 				if (!IDElement)
 					throw new Error(ERROR.CLASS("project"));
@@ -179,7 +183,6 @@ if (process.env.NODE_ENV !== 'production') {
 				if (!textEl)
 					throw new Error(ERROR.CLASS("project-text"));
 
-				console.log("here");
 				textEl.contentEditable = CONTENTEDITABLE;
 				textEl.focus();
 			}

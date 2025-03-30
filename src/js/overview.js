@@ -23,7 +23,7 @@ const overviewTrash = {
 export const overviewList = [overviewToday, overviewSeven, overviewAll, overviewTrash];
 
 // all dates after today (today excluded) are in Trash
-function isTrash(date) {
+export function isTrash(date) {
 	return (isBefore(date, subDays(new Date(), 1)));
 }
 
