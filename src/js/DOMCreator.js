@@ -3,6 +3,7 @@ import { formatRelativeToNow } from "./date.js";
 import { TODO_TYPE, PRIORITY_VAL1, PRIORITY_VAL2, PRIORITY_VAL3 } from "./Todo.js";
 import { PROJECT_TYPE } from "./Project.js";
 import * as ERROR from "./error_constants.js";
+import { overviewList } from "./overview.js";
 
 import { differenceInMinutes, isBefore, isAfter, isToday, addDays, subDays } from "date-fns";
 
@@ -14,37 +15,6 @@ const PRIORITY_SEPARATOR = "pri:";
 const DUEDATE_SEPARATOR = "date:";
 const DUETIME_SEPARATOR = "time:";
 const TITLE_SEPARATOR = "titl:";
-
-const overviewToday = {
-	id: "todo-today", // needs to be the same as the ID in template.html
-	fn: isToday
-};
-
-const overviewSeven = {
-	id: "todo-seven",
-	fn: isNextSevenDays
-}
-
-const overviewAll = {
-	id: "todo-all",
-	fn: () => 1
-}
-
-const overviewTrash = {
-	id: "todo-trash",
-	fn: isTrash
-}
-
-const overviewList = [overviewToday, overviewSeven, overviewAll, overviewTrash];
-
-function isTrash() {
-	return (1);
-}
-
-function isNextSevenDays(date) {
-	return (isAfter(date, subDays(new Date(), 1)) &&
-		isBefore(date, addDays(new Date(), 6)));
-}
 
 function getMinutesAndSeconds(time) {
 	let s = time.split(":");
