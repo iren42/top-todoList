@@ -243,7 +243,6 @@ if (process.env.NODE_ENV !== 'production') {
 				if (!IDElement.id)
 					throw new Error(ERROR.ID(IDElement));
 
-				console.log("project");
 				// only one 'active' HTMLelement
 				removeActiveClasses();
 				IDElement.classList.add("active");

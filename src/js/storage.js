@@ -20,6 +20,16 @@ export function storageAvailable(type)
     }
 }
 
+export function printAll()
+{
+	for(let key in localStorage)
+	{
+		if(localStorage.hasOwnProperty(key))
+			console.log(`${key} : ${localStorage[key]}`);
+	}
+}
+
+
 export function getItem(key)
 {
     return (JSON.parse(localStorage.getItem(key)));

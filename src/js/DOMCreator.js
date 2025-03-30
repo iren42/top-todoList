@@ -82,7 +82,8 @@ function sortDates(a, b) {
 
 function createOverviewTodoList(fnDateInterval) {
 	const todoArr = [];
-	for (let i = 0; i < Storage.getLength(); i++) {
+	const len = Storage.getLength();
+	for (let i = 0; i < len; i++) {
 		const key = Storage.key(i);
 		const stored = Storage.getItem(key);
 		if (!stored)
@@ -97,7 +98,8 @@ function createOverviewTodoList(fnDateInterval) {
 
 function createProjectTodoList(projectID) {
 	const todoArray = [];
-	for (let i = 0; i < Storage.getLength(); i++) {
+	const len = Storage.getLength();
+	for (let i = 0; i < len; i++) {
 		const key = Storage.key(i);
 		const stored = Storage.getItem(key);
 		if (!stored)
@@ -148,10 +150,11 @@ function openOverview(overviewObj) {
 // in charge of updating the DOM
 export const DOMCreator = (function() {
 	function updateSidebar() {
+		const len = Storage.getLength();
 		const projectListDiv = document.querySelector(".projectList");
 		projectListDiv.innerHTML = "";
 
-		for (let i = 0; i < Storage.getLength(); i++) {
+		for (let i = 0; i < len; i++) {
 			const key = Storage.key(i);
 			const stored = Storage.getItem(key);
 			if (!stored)

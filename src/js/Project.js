@@ -52,7 +52,9 @@ export const project = (function() {
 	}
 
 	function removeTodoSurplus(projectObject, limit) {
-		for (let i = 0; i < Storage.getLength(); i++) {
+		const len = Storage.getLength();
+		const keysToRemove = [];
+		for (let i = 0; i < len; i++) {
 			const key = Storage.key(i);
 			const stored = Storage.getItem(key);
 			if (!stored)
@@ -67,8 +69,9 @@ export const project = (function() {
 			if (Number(number_) < limit)
 				continue;
 
-			Storage.removeItem(key);
+			keysToRemove.push(key);
 		}
+		keysToRemove.map(key => Storage.removeItem(key));
 	}
 
 	function updateTodoList(projectObject) {
@@ -107,24 +110,29 @@ export const project = (function() {
 	}
 
 	// 'delete' is a reserved word
+	// don't call Storage.removeItem() while in a loop over Storage items
+	// it produces a bug
 	function remove(key) {
 		const projectObject = Storage.getItem(key);
 		if (!projectObject)
 			throw new Error(ERROR.KEY(key));
-		for (let i = 0; i < Storage.getLength(); i++)
+		const len = Storage.getLength();
+		const keysToRemove = [];
+		for (let i = 0; i < len; i++)
 		{
 			const todoKey = Storage.key(i);
 			const stored = Storage.getItem(todoKey);
 			if (!stored)
 				throw new Error(ERROR.KEY(todoKey));
-			if (stored.type === PROJECT_TYPE)
+			if (stored.type !== TODO_TYPE)
 				continue;
 			if (stored.projectID !== projectObject.id)
 				continue;
 
-			Storage.removeItem(todoKey);
+			keysToRemove.push(todoKey);
 		}
-		Storage.removeItem(key);
+		keysToRemove.push(key);
+		keysToRemove.map(key => Storage.removeItem(key));
 	}
 
 	function updateContentWithTodo(target, source) {
