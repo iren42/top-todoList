@@ -134,17 +134,47 @@ function clearAll() {
 	todoListDiv.innerHTML = "";
 }
 
+function updateTodoList(todoArray) {
+	const ul = document.querySelector(".todoList");
+	ul.innerHTML = "";
+	const IDArray = [];
+	let radioID;
+	let checkID;
+
+	for (let i = 0; i < todoArray.length; i++) {
+		ul.append(DOMCreator.todo(todoArray[i]));
+		radioID = todoArray[i].priority + PRIORITY_SEPARATOR + todoArray[i].id;
+		checkID = CHECKBOX_SEPARATOR + todoArray[i].id;
+
+		IDArray.push(radioID);
+		if (todoArray[i].isChecked === "on")
+			IDArray.push(checkID);
+	}
+	checkTodoInput(IDArray);
+}
+
+function createEditor(projectObj) {
+	if (!projectObj)
+		throw new Error(ERROR.OBJ());
+	const leftDiv = document.querySelector(".left");
+	leftDiv.innerHTML = "";
+	leftDiv.innerHTML = `
+		<button type="button " id="saveBtn">Save</button>
+		<div class="editor" contenteditable="${CONTENTEDITABLE}"  data-text="Write here..." >${projectObj.content}</div>
+	`;
+}
+
 function openProject(projectObj) {
-	DOMCreator.updateEditor(projectObj.id);
+	createEditor(projectObj);
 
 	const todoArr = createProjectTodoList(projectObj.id);
-	DOMCreator.updateTodoList(todoArr);
+	updateTodoList(todoArr);
 }
 
 function openOverview(overviewObj) {
 	const todoArr = createOverviewTodoList(overviewObj.fn);
 	todoArr.sort(sortDates);
-	DOMCreator.updateTodoList(todoArr);
+	updateTodoList(todoArr);
 }
 
 // in charge of updating the DOM
@@ -277,37 +307,6 @@ export const DOMCreator = (function() {
 		return (li);
 	}
 
-	function updateTodoList(todoArray) {
-		const ul = document.querySelector(".todoList");
-		ul.innerHTML = "";
-		const IDArray = [];
-		let radioID;
-		let checkID;
-
-		for (let i = 0; i < todoArray.length; i++) {
-			ul.append(todo(todoArray[i]));
-			radioID = todoArray[i].priority + PRIORITY_SEPARATOR + todoArray[i].id;
-			checkID = CHECKBOX_SEPARATOR + todoArray[i].id;
-
-			IDArray.push(radioID);
-			if (todoArray[i].isChecked === "on")
-				IDArray.push(checkID);
-		}
-		checkTodoInput(IDArray);
-	}
-
-	function updateEditor(projectID) {
-		const projectObj = Storage.getItem(projectID);
-		if (!projectObj)
-			return;
-		const leftDiv = document.querySelector(".left");
-		leftDiv.innerHTML = "";
-		leftDiv.innerHTML = `
-			<button type="button " id="saveBtn">Save</button>
-			<div class="editor" contenteditable="${CONTENTEDITABLE}"  data-text="Write here..." >${projectObj.content}</div>
-		`;
-	}
-
 	function updateActive() {
 		let active = document.querySelector(".active");
 		if (!active) {
@@ -331,8 +330,8 @@ export const DOMCreator = (function() {
 	}
 
 	return ({
-		updateTodoList,
-		updateEditor,
+		todo,
+		project,
 		updateActive,
 		updateSidebar,
 	})

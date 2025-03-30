@@ -9,3 +9,7 @@ export function KEY(key) {
 export function ID(element) {
     return (`No id for this element: ${element}`);
 }
+
+export function OBJ() {
+	return (`No object`);
+}
