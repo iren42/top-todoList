@@ -42,12 +42,12 @@ E.g.
 
 ## Things it can do
 - Create projects and to-do tasks
-- Check to-do tasks in the task object (on the right side of the page)
-- Check to-do tasks in the editor by replacing the prefix "- [ ] " to "- [x] " (it is the markdown syntax). Always remember to save the latest changes made in the editor
+- Check to-do tasks from the task object (on the right side of the page)
+- Check to-do tasks from the editor by replacing the prefix "- [ ] " to "- [x] " (it is the markdown syntax). Always remember to save the latest changes made in the editor
 - Edit to-do task in the editor and in the task object
 - Add a due date and a due time to the tasks
 - Change a task's priority level
-- Delete tasks in the editor by deleting the to-do prefix ("- [ ] " or "- [x] ")
+- Delete tasks from the editor by deleting the to-do prefix ("- [ ] " or "- [x] ")
 - Rename projects and to-do tasks
 - Delete projects and to-do tasks
 
@@ -57,4 +57,9 @@ I used the markdown syntax because I like markdown, I use it for my personal not
 
 ## More informations
 ### How are to-do tasks' identifier made
-A to-do task's ID is made of its project's line number and its project's ID.
+A to-do task's identifer (ID) is made of its project's line number and its project's ID.
+
+## Improve it
+- Add line numbers in the editor
+- Redesign UX and IU
+- Allow "- " as a to-do task prefix
