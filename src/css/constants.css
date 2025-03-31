@@ -30,16 +30,16 @@
 	--box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 
 	--dark: #181818;
-	--light: #F2F3F4;
-	--grey: #D7D7D9;
-	--light-grey: #E8E9EB;
-	--dark-grey: #AFAFB0;
+	--light: #f2f3f4;
+	--grey: #d7d7d9;
+	--light-grey: #e8e9eb;
+	--dark-grey: #afafb0;
 	--blue: #0087af;
 
 	--priority-medium: green;
 	--priority-high: orange;
 
-    /* --darker-grey: #A4A5A6; */
+	/* --darker-grey: #A4A5A6; */
 	--foreground: var(--dark);
 	--background: var(--light);
 	--border-color: var(--grey);

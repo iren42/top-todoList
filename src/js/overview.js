@@ -1,40 +1,51 @@
-import { isWithinInterval, isBefore, isToday, addDays, subDays } from "date-fns";
+import {
+	isWithinInterval,
+	isBefore,
+	isToday,
+	addDays,
+	subDays,
+} from "date-fns";
 
 const overviewToday = {
-	id: "todo-today", // needs to be the same as the ID in template.html
-	fn: isToday
+	id: "todo-today", // Needs to be the same as the ID in template.html
+	fn: isToday,
 };
 
 const overviewSeven = {
 	id: "todo-seven",
-	fn: isWithinSevenDays
-}
+	fn: isWithinSevenDays,
+};
 
 const overviewAll = {
 	id: "todo-all",
-	fn: isNotTrash
-}
+	fn: isNotTrash,
+};
 
 const overviewTrash = {
 	id: "todo-trash",
-	fn: isTrash
-}
+	fn: isTrash,
+};
 
-export const overviewList = [overviewToday, overviewSeven, overviewAll, overviewTrash];
+export const overviewList = [
+	overviewToday,
+	overviewSeven,
+	overviewAll,
+	overviewTrash,
+];
 
-// all dates after today (today excluded) are in Trash
+// All dates after today (today excluded) are in Trash
 export function isTrash(date) {
-	return (isBefore(date, subDays(new Date(), 1)));
+	return isBefore(date, subDays(new Date(), 1));
 }
 
 function isNotTrash(date) {
-	return (!(isBefore(date, subDays(new Date(), 1))));
+	return !isBefore(date, subDays(new Date(), 1));
 }
 
-// today is included
+// Today is included
 function isWithinSevenDays(date) {
-	return (isWithinInterval(date, {
+	return isWithinInterval(date, {
 		start: subDays(new Date(), 1),
-		end: addDays(new Date(), 7)
-	}));
+		end: addDays(new Date(), 7),
+	});
 }

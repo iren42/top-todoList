@@ -1,6 +1,8 @@
-@import './constants.css';
+@import "./constants.css";
 
-.editor[contentEditable]:not([contentEditable=false]):empty:not(:focus):before{
+.editor[contentEditable]:not([contentEditable="false"]):empty:not(
+		:focus
+	):before {
 	content: attr(data-text);
 	color: var(--dark-grey);
 }
@@ -25,7 +27,6 @@
 }
 
 .main {
-
 	& .editor {
 		flex-grow: 1;
 		width: 100%;
@@ -43,7 +44,6 @@
 		content: attr(data-default);
 		color: var(--dark-grey);
 	}
-
 }
 
 #saveBtn,
@@ -151,7 +151,7 @@
 			"input label label button"
 			"projectName projectName dueDate dueDate";
 
-		& input[type=checkbox] {
+		& input[type="checkbox"] {
 			grid-area: input;
 			height: var(--icon-md);
 			width: var(--icon-md);

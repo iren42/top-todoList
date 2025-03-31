@@ -1,6 +1,6 @@
 @import "~@flaticon/flaticon-uicons/css/all/all";
-@import './constants.css';
-@import './main.css';
+@import "./constants.css";
+@import "./main.css";
 
 *,
 *::before,
@@ -17,7 +17,18 @@ body {
 
 body {
 	height: 100svh;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		Roboto,
+		Oxygen,
+		Ubuntu,
+		Cantarell,
+		"Open Sans",
+		"Helvetica Neue",
+		sans-serif;
 	background-color: var(--background);
 	color: var(--foreground);
 }
@@ -232,35 +243,35 @@ footer {
 
 /* DROPDOWN */
 .dropbtn {
-    border: none;
-    cursor: pointer;
-    height: var(--icon-lg);
-    width: var(--icon-lg);
-    border-radius: var(--border-radius);
-    display: inline-block;
+	border: none;
+	cursor: pointer;
+	height: var(--icon-lg);
+	width: var(--icon-lg);
+	border-radius: var(--border-radius);
+	display: inline-block;
 }
 
 .dropdown {
-    position: relative;
-    display: inline-block;
+	position: relative;
+	display: inline-block;
 }
 
 /* vertically align icon.dropbtn */
 i.dropbtn::before {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: inherit;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: inherit;
 }
 
 .dropdown-content {
-    display: none;
-    border-radius: var(--border-radius);
-    position: absolute;
-    background-color: var(--background);
-    min-width: 160px;
+	display: none;
+	border-radius: var(--border-radius);
+	position: absolute;
+	background-color: var(--background);
+	min-width: 160px;
 	box-shadow: var(--box-shadow);
-    z-index: 1;
+	z-index: 1;
 }
 
 .overview:only-child .dropdown-content {
@@ -269,31 +280,31 @@ i.dropbtn::before {
 }
 
 .dropdown-content div {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    text-decoration: none;
-    display: block;
-    border-radius: inherit;
-    margin: var(--spacing-xxs);
+	padding: var(--spacing-xs) var(--spacing-sm);
+	text-decoration: none;
+	display: block;
+	border-radius: inherit;
+	margin: var(--spacing-xxs);
 }
 
 .dropdown-content div:hover {
-    background-color: var(--hover-color);
+	background-color: var(--hover-color);
 }
 
 .dropdown:hover .dropdown-content {
-    display: block;
+	display: block;
 }
 
 .dropdown:hover .dropbtn {
-    background-color: var(--grey);
+	background-color: var(--grey);
 }
 
 .project.active .dropdown:hover .dropbtn {
-    background-color: var(--dark-grey);
+	background-color: var(--dark-grey);
 	color: var(--foreground);
 }
 
 .sidebar.collapse .dropdown,
 .sidebar.collapse .dropdown-content {
-    display: none;
+	display: none;
 }

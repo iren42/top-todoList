@@ -1,71 +1,80 @@
 import "./css/normalize.css";
 import "./css/style.css";
-
-import { project } from "./js/Project.js"
+import { project } from "./js/Project.js";
 import { CONTENTEDITABLE, DOMCreator } from "./js/DOMCreator.js";
 import * as ERROR from "./js/error_constants.js";
 
-if (process.env.NODE_ENV !== 'production') {
-	console.log('Looks like we are in development mode!');
+if (process.env.NODE_ENV !== "production") {
+	console.log("Looks like we are in development mode!");
 }
+
 {
-	let sidebar = document.querySelector('.sidebar');
-	let arrowCollapse = document.querySelector('#collapse-sidebar-icon');
+	const sidebar = document.querySelector(".sidebar");
+	const arrowCollapse = document.querySelector("#collapse-sidebar-icon");
 	if (arrowCollapse && sidebar) {
-		arrowCollapse.onclick = () => {
-			sidebar.classList.toggle('collapse');
-			arrowCollapse.classList.toggle('collapse');
-			if (arrowCollapse.classList.contains('collapse')) {
-				arrowCollapse.classList = "fi fi-rr-angle-right collapse";
-			}
-			else {
-				arrowCollapse.classList = "fi fi-rr-angle-left";
-			}
-		};
+		arrowCollapse.addEventListener("click", () => {
+			sidebar.classList.toggle("collapse");
+			arrowCollapse.classList.toggle("collapse");
+			arrowCollapse.classList = arrowCollapse.classList.contains(
+				"collapse",
+			)
+				? "fi fi-rr-angle-right collapse"
+				: "fi fi-rr-angle-left";
+		});
 	}
 }
 
 {
-	function findParentElByClass(element, className) {
-		if (!(element instanceof HTMLElement))
-			throw new Error(`Not a HTMLElement ${element}`);
+	function findParentElementByClass(element, className) {
+		if (!(element instanceof HTMLElement)) {
+			throw new TypeError(`Not a HTMLElement ${element}`);
+		}
+
 		if (!element.classList.contains(className)) {
 			while (!element.classList.contains(className)) {
 				element = element.parentElement;
 			}
 		}
-		return (element);
+
+		return element;
 	}
 
-	function removeBR(str) {
-		if (!str.endsWith("\n"))
-			return (str);
-		return (str.slice(0, str.length - 1));
+	function removeBR(string_) {
+		if (!string_.endsWith("\n")) {
+			return string_;
+		}
+
+		return string_.slice(0, -1);
 	}
 
 	function renameProject(eventTarget) {
-		let IDElement = findParentElByClass(eventTarget, "project");
-		if (!IDElement)
+		const IDElement = findParentElementByClass(eventTarget, "project");
+		if (!IDElement) {
 			throw new Error(ERROR.CLASS("project"));
-		let textEl = IDElement.querySelector(".project-text");
-		if (!textEl)
-			throw new Error(ERROR.CLASS("project-text"));
+		}
 
-		project.rename(IDElement.id, textEl.innerText);
+		const textElement = IDElement.querySelector(".project-text");
+		if (!textElement) {
+			throw new Error(ERROR.CLASS("project-text"));
+		}
+
+		project.rename(IDElement.id, textElement.innerText);
 		eventTarget.contentEditable = false;
 	}
 
 	function removeActiveClasses() {
 		const list = document.querySelectorAll(".active");
-		if (!list)
+		if (!list) {
 			return;
-		for (let i = 0; i < list.length; i++) {
-			list[i].classList.remove("active");
+		}
+
+		for (const element of list) {
+			element.classList.remove("active");
 		}
 	}
 
 	const projectListDiv = document.querySelector("ul.projectList");
-	projectListDiv.addEventListener("focusout", event => {
+	projectListDiv.addEventListener("focusout", (event) => {
 		try {
 			if (event.target.closest(".project-text")) {
 				renameProject(event.target);
@@ -74,11 +83,14 @@ if (process.env.NODE_ENV !== 'production') {
 		} catch (error) {
 			console.error(error);
 		}
-	})
+	});
 
-	projectListDiv.addEventListener("keydown", event => {
+	projectListDiv.addEventListener("keydown", (event) => {
 		try {
-			if (event.key === "Enter" && event.target.closest(".project-text")) {
+			if (
+				event.key === "Enter" &&
+				event.target.closest(".project-text")
+			) {
 				event.preventDefault();
 				renameProject(event.target);
 				DOMCreator.updateActive();
@@ -86,178 +98,228 @@ if (process.env.NODE_ENV !== 'production') {
 		} catch (error) {
 			console.error(error);
 		}
-	})
+	});
 
 	const todoListDiv = document.querySelector(".todoList");
-	todoListDiv.addEventListener("change", event => {
+	todoListDiv.addEventListener("change", (event) => {
 		try {
 			if (event.target.closest("input[type='checkbox']")) {
-				if (!(event.target instanceof HTMLInputElement))
+				if (!(event.target instanceof HTMLInputElement)) {
 					return;
-				if (!event.target.id)
+				}
+
+				if (!event.target.id) {
 					throw new Error(ERROR.ID(event.target));
-				let IDElement = findParentElByClass(event.target, "todo");
-				if (!IDElement)
+				}
+
+				const IDElement = findParentElementByClass(
+					event.target,
+					"todo",
+				);
+				if (!IDElement) {
 					throw new Error(ERROR.CLASS("todo"));
-				if (!IDElement.id)
+				}
+
+				if (!IDElement.id) {
 					throw new Error(ERROR.ID(IDElement));
-				console.log("change state of checkbox to " + event.target.checked);
+				}
 
-				const todoObj = project.get(IDElement.id);
-				if (!todoObj)
+				console.log(
+					"change state of checkbox to " + event.target.checked,
+				);
+
+				const todoObject = project.get(IDElement.id);
+				if (!todoObject) {
 					throw new Error(ERROR.KEY(IDElement.id));
+				}
 
-				project.toggleCheckbox(todoObj, event.target);
+				project.toggleCheckbox(todoObject, event.target);
 
 				DOMCreator.updateActive();
 			}
 		} catch (error) {
 			console.error(error);
 		}
-	})
+	});
 
-	todoListDiv.addEventListener("submit", event => {
+	todoListDiv.addEventListener("submit", (event) => {
 		try {
 			event.preventDefault();
-			if (!event.target.id)
+			if (!event.target.id) {
 				throw new Error(ERROR.ID(event.target));
+			}
 
-			const todoObj = project.get(event.target.id);
-			if (!todoObj)
+			const todoObject = project.get(event.target.id);
+			if (!todoObject) {
 				throw new Error(ERROR.KEY(event.target.id));
+			}
+
 			console.log("save todo");
 
 			const formData = new FormData(event.target);
-			project.updateFromTodoToProject(todoObj, formData);
+			project.updateFromTodoToProject(todoObject, formData);
 
 			DOMCreator.updateActive();
 		} catch (error) {
 			console.error(error);
 		}
-	})
+	});
 
-	document.addEventListener("click", event => {
+	document.addEventListener("click", (event) => {
 		try {
 			if (event.target.closest(".delete-todo")) {
-				let IDElement = findParentElByClass(event.target, "todo");
-				if (!IDElement)
+				const IDElement = findParentElementByClass(
+					event.target,
+					"todo",
+				);
+				if (!IDElement) {
 					throw new Error(ERROR.CLASS("todo"));
-				if (!IDElement.id)
+				}
+
+				if (!IDElement.id) {
 					throw new Error(ERROR.ID(IDElement));
+				}
+
 				const projectID = IDElement.dataset.projectid;
-				if (!projectID)
-					throw new Error(`No dataset projectid`);
+				if (!projectID) {
+					throw new Error("No dataset projectid");
+				}
 
 				project.remove(IDElement.id);
 				DOMCreator.updateActive();
-			}
-			else if (event.target.closest(".expand-todo")) {
-				let button = findParentElByClass(event.target, "fi");
-				let IDElement = findParentElByClass(event.target, "todo");
-				if (!IDElement)
+			} else if (event.target.closest(".expand-todo")) {
+				const button = findParentElementByClass(event.target, "fi");
+				const IDElement = findParentElementByClass(
+					event.target,
+					"todo",
+				);
+				if (!IDElement) {
 					throw new Error(ERROR.CLASS("todo"));
+				}
 
-				IDElement.classList.toggle('collapse');
-				if (IDElement.classList.contains("collapse"))
-					button.classList = "fi fi-tr-square-plus";
-				else
-					button.classList = "fi fi-tr-square-minus";
-			}
-			else if (event.target.closest(".delete-project")) {
-				let IDElement = findParentElByClass(event.target, "project");
-				if (!IDElement)
+				IDElement.classList.toggle("collapse");
+				button.classList = IDElement.classList.contains("collapse")
+					? "fi fi-tr-square-plus"
+					: "fi fi-tr-square-minus";
+			} else if (event.target.closest(".delete-project")) {
+				const IDElement = findParentElementByClass(
+					event.target,
+					"project",
+				);
+				if (!IDElement) {
 					throw new Error(ERROR.CLASS("project"));
-				if (!IDElement.id)
+				}
+
+				if (!IDElement.id) {
 					throw new Error(ERROR.ID(IDElement));
+				}
 
 				console.log("delete project");
 				project.remove(IDElement.id);
 				DOMCreator.updateSidebar();
 				DOMCreator.updateActive();
-			}
-			else if (event.target.closest("#emptyTrash")) {
+			} else if (event.target.closest("#emptyTrash")) {
 				console.log("empty trash");
 				project.removeTrash();
 				DOMCreator.updateActive();
-			}
-			else if (event.target.closest(".rename-project")) {
-				let IDElement = findParentElByClass(event.target, "project");
-				if (!IDElement)
+			} else if (event.target.closest(".rename-project")) {
+				const IDElement = findParentElementByClass(
+					event.target,
+					"project",
+				);
+				if (!IDElement) {
 					throw new Error(ERROR.CLASS("project"));
-				let textEl = IDElement.querySelector(".project-text");
-				if (!textEl)
-					throw new Error(ERROR.CLASS("project-text"));
+				}
 
-				textEl.contentEditable = CONTENTEDITABLE;
-				textEl.focus();
-			}
-			else if (event.target.closest("#addNewProject")) {
+				const textElement = IDElement.querySelector(".project-text");
+				if (!textElement) {
+					throw new Error(ERROR.CLASS("project-text"));
+				}
+
+				textElement.contentEditable = CONTENTEDITABLE;
+				textElement.focus();
+			} else if (event.target.closest("#addNewProject")) {
 				console.log("add a new project");
 				const newProject = project.create();
 				DOMCreator.updateSidebar();
 
 				removeActiveClasses();
 
-				const projectEl = document.querySelector(`#${CSS.escape(newProject.id)}`);
-				projectEl.classList.add("active");
+				const projectElement = document.querySelector(
+					`#${CSS.escape(newProject.id)}`,
+				);
+				projectElement.classList.add("active");
 				DOMCreator.updateActive();
-			}
-			else if (event.target.closest("#clearBtn")) {
+			} else if (event.target.closest("#clearBtn")) {
 				console.log("clear all data");
 				project.clearAll();
 				DOMCreator.updateSidebar();
 				DOMCreator.updateActive();
-			}
-			else if (event.target.closest("#saveBtn")) {
+			} else if (event.target.closest("#saveBtn")) {
 				console.log("save project");
 				const IDElement = document.querySelector(".project.active");
-				if (!IDElement)
+				if (!IDElement) {
 					throw new Error(ERROR.CLASS("project active"));
-				if (!IDElement.id)
-					throw new Error(ERROR.ID(IDElement));
+				}
 
-				// edited div with contentEditable adds a newline even if its content is empty
+				if (!IDElement.id) {
+					throw new Error(ERROR.ID(IDElement));
+				}
+
+				// Edited div with contentEditable adds a newline even if its content is empty
 				const editor = document.querySelector(".editor");
-				if (!editor)
+				if (!editor) {
 					throw new Error("No editor");
-				let editorText = removeBR(editor.innerText);
+				}
 
-				const projectObj = project.get(IDElement.id);
-				if (!projectObj)
+				const editorText = removeBR(editor.innerText);
+
+				const projectObject = project.get(IDElement.id);
+				if (!projectObject) {
 					throw new Error(ERROR.KEY(IDElement.id));
+				}
 
-				project.update(projectObj, { content: editorText });
-				project.updateTodoList(projectObj);
+				project.update(projectObject, { content: editorText });
+				project.updateTodoList(projectObject);
 
 				DOMCreator.updateActive();
-			}
-			else if (event.target.closest(".overview")) {
-				let IDElement = findParentElByClass(event.target, "overview");
-				if (!IDElement)
+			} else if (event.target.closest(".overview")) {
+				const IDElement = findParentElementByClass(
+					event.target,
+					"overview",
+				);
+				if (!IDElement) {
 					throw new Error(ERROR.CLASS("overview"));
-				if (!IDElement.id)
-					throw new Error(ERROR.ID(IDElement));
+				}
 
-				// only one 'active' HTMLelement
+				if (!IDElement.id) {
+					throw new Error(ERROR.ID(IDElement));
+				}
+
+				// Only one 'active' HTMLelement
 				removeActiveClasses();
 				IDElement.classList.add("active");
 
 				DOMCreator.updateActive();
-			}
-			else if (event.target.closest(".project")) {
-				let IDElement = findParentElByClass(event.target, "project");
-				if (!IDElement)
+			} else if (event.target.closest(".project")) {
+				const IDElement = findParentElementByClass(
+					event.target,
+					"project",
+				);
+				if (!IDElement) {
 					throw new Error(ERROR.CLASS("project"));
-				if (!IDElement.id)
-					throw new Error(ERROR.ID(IDElement));
+				}
 
-				// only one 'active' HTMLelement
+				if (!IDElement.id) {
+					throw new Error(ERROR.ID(IDElement));
+				}
+
+				// Only one 'active' HTMLelement
 				removeActiveClasses();
 				IDElement.classList.add("active");
 
 				DOMCreator.updateActive();
-			}
-			else;
+			} else;
 		} catch (error) {
 			console.error(error);
 		}
